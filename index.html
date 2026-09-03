@@ -1,16 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-
+  <meta charset="utf-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
-
+  <meta name="theme-color" content="#142d2a">
   <meta
     name="description"
-    content="식물을 재배하고 생명공학 퀘스트를 수행하며 연구소를 성장시키는 픽셀 아트 교육용 RPG"
+    content="식물 재배와 생명공학 연구를 수행하는 픽셀 아트 교육 RPG"
   >
 
   <title>BIO LAB</title>
@@ -19,1058 +18,336 @@
 </head>
 
 <body>
-
-  <!-- 알림 메시지 -->
-  <div id="toast" class="toast hidden" role="status"></div>
-
-
-  <!-- ==================================================
-       1. 시작 화면
-  =================================================== -->
-  <main id="title-screen" class="screen title-screen">
-
-    <div class="title-background" aria-hidden="true">
-
-      <div class="pixel-cloud cloud-one"></div>
-      <div class="pixel-cloud cloud-two"></div>
-
-      <div class="mountain mountain-back"></div>
-      <div class="mountain mountain-front"></div>
-
-      <div class="title-laboratory">
-        <div class="lab-roof"></div>
-        <div class="lab-sign">BIO LAB</div>
-
-        <div class="lab-window window-one"></div>
-        <div class="lab-window window-two"></div>
-
-        <div class="lab-door"></div>
-      </div>
-
-      <div class="title-greenhouse">
-        <div class="greenhouse-glass"></div>
-        <div class="greenhouse-door"></div>
-
-        <div class="greenhouse-plant plant-one"></div>
-        <div class="greenhouse-plant plant-two"></div>
-        <div class="greenhouse-plant plant-three"></div>
-      </div>
-
-      <div class="title-field">
-        <div class="field-row"></div>
-        <div class="field-row"></div>
-        <div class="field-row"></div>
-      </div>
-
-      <div class="title-path"></div>
-
-      <div id="title-character" class="pixel-character title-character">
-        <div class="character-hair"></div>
-        <div class="character-face"></div>
-        <div class="character-body"></div>
-        <div class="character-leg left-leg"></div>
-        <div class="character-leg right-leg"></div>
-      </div>
-
-    </div>
-
-    <section class="title-content">
-
-      <h1 class="game-logo" aria-label="BIO LAB">
-        <span class="logo-bio">BIO</span>
-        <span class="logo-lab">LAB</span>
-      </h1>
-
-      <nav class="title-menu" aria-label="시작 메뉴">
-
-        <button
-          id="new-game-button"
-          class="pixel-button title-button primary-button"
-          type="button"
-        >
-          <span aria-hidden="true">🌱</span>
-          새로운 연구
-        </button>
-
-        <button
-          id="continue-button"
-          class="pixel-button title-button"
-          type="button"
-        >
-          <span aria-hidden="true">🧬</span>
-          이어하기
-        </button>
-
-        <button
-          id="help-button"
-          class="pixel-button title-button"
-          type="button"
-        >
-          <span aria-hidden="true">⚙</span>
-          플레이 방법
-        </button>
-
-      </nav>
-
-    </section>
-
-    <p class="title-footer">
-      LIFE SCIENCE RPG · SPRING RESEARCH
-    </p>
-
-  </main>
-
-
-  <!-- ==================================================
-       2. 캐릭터 선택 화면
-  =================================================== -->
-  <main id="character-screen" class="screen character-screen hidden">
-
-    <section class="character-card">
-
-      <header class="section-header">
-        <p class="section-label">NEW RESEARCHER</p>
-        <h2>연구원 등록</h2>
-        <p>캐릭터의 모습과 첫 번째 연구 분야를 선택하세요.</p>
-      </header>
-
-      <div class="character-selection-layout">
-
-        <!-- 캐릭터 미리보기 -->
-        <section class="character-preview-panel">
-
-          <div
-            id="character-preview"
-            class="pixel-character character-preview"
-            aria-label="선택한 캐릭터 미리보기"
-          >
-            <div class="character-hair"></div>
-            <div class="character-face"></div>
-            <div class="character-body"></div>
-            <div class="character-leg left-leg"></div>
-            <div class="character-leg right-leg"></div>
-          </div>
-
-          <strong id="preview-name">새봄</strong>
-
-          <p id="preview-specialty">
-            분자생물학 연구원
-          </p>
-
-        </section>
-
-
-        <!-- 캐릭터 설정 -->
-        <section class="character-options">
-
-          <label class="option-group">
-            <span>연구원 이름</span>
-
-            <input
-              id="researcher-name"
-              type="text"
-              value="새봄"
-              maxlength="8"
-              autocomplete="off"
-              placeholder="이름 입력"
-            >
-          </label>
-
-
-          <fieldset class="option-group">
-
-            <legend>헤어 컬러</legend>
-
-            <div id="hair-options" class="color-options">
-
-              <button
-                class="color-button selected"
-                type="button"
-                data-hair="brown"
-                style="--option-color: #563829"
-                aria-label="갈색 머리"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-hair="yellow"
-                style="--option-color: #e6b94f"
-                aria-label="금색 머리"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-hair="navy"
-                style="--option-color: #27394d"
-                aria-label="남색 머리"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-hair="purple"
-                style="--option-color: #824663"
-                aria-label="보라색 머리"
-              ></button>
-
-            </div>
-
-          </fieldset>
-
-
-          <fieldset class="option-group">
-
-            <legend>연구복 컬러</legend>
-
-            <div id="coat-options" class="color-options">
-
-              <button
-                class="color-button selected"
-                type="button"
-                data-coat="white"
-                style="--option-color: #f7f0d8"
-                aria-label="흰색 연구복"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-coat="mint"
-                style="--option-color: #77c3b8"
-                aria-label="민트색 연구복"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-coat="coral"
-                style="--option-color: #e99a89"
-                aria-label="코랄색 연구복"
-              ></button>
-
-              <button
-                class="color-button"
-                type="button"
-                data-coat="blue"
-                style="--option-color: #8fa9d6"
-                aria-label="파란색 연구복"
-              ></button>
-
-            </div>
-
-          </fieldset>
-
-
-          <fieldset class="option-group">
-
-            <legend>연구 분야</legend>
-
-            <div id="specialty-options" class="specialty-options">
-
-              <button
-                class="specialty-button selected"
-                type="button"
-                data-specialty="분자생물학"
-              >
-                <strong>분자생물학</strong>
-                <span>DNA와 PCR 연구 보상 증가</span>
-              </button>
-
-              <button
-                class="specialty-button"
-                type="button"
-                data-specialty="세포공학"
-              >
-                <strong>세포공학</strong>
-                <span>세포 배양 연구에 유리</span>
-              </button>
-
-              <button
-                class="specialty-button"
-                type="button"
-                data-specialty="바이오인포매틱스"
-              >
-                <strong>바이오인포매틱스</strong>
-                <span>퀴즈 힌트와 분석 능력 강화</span>
-              </button>
-
-              <button
-                class="specialty-button"
-                type="button"
-                data-specialty="의생명학"
-              >
-                <strong>의생명학</strong>
-                <span>질병 진단 연구 보상 증가</span>
-              </button>
-
-            </div>
-
-          </fieldset>
-
-        </section>
-
-      </div>
-
-      <footer class="character-footer">
-
-        <button
-          id="character-back-button"
-          class="pixel-button"
-          type="button"
-        >
-          ← 돌아가기
-        </button>
-
-        <button
-          id="enter-lab-button"
-          class="pixel-button primary-button"
-          type="button"
-        >
-          BIO LAB 입소하기 →
-        </button>
-
-      </footer>
-
-    </section>
-
-  </main>
-
-
-  <!-- ==================================================
-       3. 게임 화면
-  =================================================== -->
-  <main id="game-screen" class="screen game-screen hidden">
-
-    <!-- 상단 HUD -->
-    <header class="game-hud">
-
-      <section class="player-information">
-
-        <div
-          id="hud-character"
-          class="pixel-character hud-character"
-          aria-hidden="true"
-        >
-          <div class="character-hair"></div>
-          <div class="character-face"></div>
-          <div class="character-body"></div>
-          <div class="character-leg left-leg"></div>
-          <div class="character-leg right-leg"></div>
+  <main id="app">
+
+    <!-- 시작 화면 -->
+    <section
+      id="start-screen"
+      class="screen active"
+      aria-label="게임 시작"
+    >
+      <div class="start-card pixel-panel">
+
+        <div class="logo-mark" aria-hidden="true">
+          <span class="helix h1"></span>
+          <span class="helix h2"></span>
         </div>
 
-        <div>
-          <strong id="hud-player-name">새봄</strong>
+        <h1>BIO LAB</h1>
+        <p class="start-copy">연구원 등록</p>
 
-          <span id="hud-player-level">
-            LV.1 · 분자생물학
+        <label class="field-label" for="player-name">
+          이름
+        </label>
+
+        <input
+          id="player-name"
+          maxlength="10"
+          value="새봄"
+          autocomplete="off"
+        >
+
+        <p class="field-label">전공 선택</p>
+
+        <div id="role-options" class="role-options">
+
+          <button
+            class="role-card selected"
+            data-role="botanist"
+            type="button"
+          >
+            <span
+              class="role-sprite botanist"
+              aria-hidden="true"
+            ></span>
+
+            <strong>식물 연구원</strong>
+            <small>재배 성장 +10%</small>
+          </button>
+
+          <button
+            class="role-card"
+            data-role="molecular"
+            type="button"
+          >
+            <span
+              class="role-sprite molecular"
+              aria-hidden="true"
+            ></span>
+
+            <strong>분자 연구원</strong>
+            <small>퀴즈 RP +10%</small>
+          </button>
+
+          <button
+            class="role-card"
+            data-role="engineer"
+            type="button"
+          >
+            <span
+              class="role-sprite engineer"
+              aria-hidden="true"
+            ></span>
+
+            <strong>바이오 엔지니어</strong>
+            <small>장비 가격 -10%</small>
+          </button>
+
+        </div>
+
+        <button
+          id="start-btn"
+          class="pixel-button primary big"
+          type="button"
+        >
+          연구소 입장
+        </button>
+
+        <button
+          id="continue-btn"
+          class="pixel-button hidden"
+          type="button"
+        >
+          저장 기록 이어하기
+        </button>
+
+      </div>
+    </section>
+
+    <!-- 게임 화면 -->
+    <section
+      id="game-screen"
+      class="screen"
+      aria-label="BIO LAB 게임"
+    >
+
+      <!-- 상단 정보창 -->
+      <header id="hud" class="pixel-panel">
+
+        <div class="hud-group brand">
+          <strong>BIO LAB</strong>
+          <span id="zone-name">중앙 광장</span>
+        </div>
+
+        <div class="hud-group">
+          <span>DAY</span>
+          <strong id="day-value">1</strong>
+          <span id="weather-value">맑음</span>
+        </div>
+
+        <div class="hud-group">
+          <span id="time-value">08:00</span>
+
+          <div class="time-track">
+            <i id="time-fill"></i>
+          </div>
+        </div>
+
+        <div class="hud-group stats">
+          <span>
+            RP
+            <strong id="rp-value">0</strong>
+          </span>
+
+          <span>
+            재료
+            <strong id="material-value">0</strong>
           </span>
         </div>
 
-      </section>
+        <div class="hud-group stamina">
+          <span>체력</span>
 
-      <section class="resource-information">
+          <div class="stamina-track">
+            <i id="stamina-fill"></i>
+          </div>
 
-        <span class="resource-item">
-          <span aria-hidden="true">🧪</span>
-          재료
-          <strong id="material-count">4</strong>
-        </span>
-
-        <span class="resource-item">
-          RP
-          <strong id="rp-count">60</strong>
-        </span>
-
-        <span class="resource-item date-item">
-          DAY
-          <strong id="day-count">1</strong>
-          · SPRING
-        </span>
-
-      </section>
-
-      <button
-        id="game-menu-button"
-        class="hud-menu-button"
-        type="button"
-        aria-label="게임 메뉴 열기"
-      >
-        ☰
-      </button>
-
-    </header>
-
-
-    <!-- 게임 본문 -->
-    <section class="game-layout">
-
-      <!-- 게임 맵 -->
-      <section class="map-panel">
-
-        <canvas
-          id="game-canvas"
-          width="640"
-          height="360"
-          aria-label="BIO LAB 연구소 지도"
-        >
-          이 브라우저는 Canvas 기능을 지원하지 않습니다.
-        </canvas>
-
-        <div id="interaction-guide" class="interaction-guide hidden">
-          <kbd>SPACE</kbd>
-          <span id="interaction-target">상호작용</span>
+          <strong id="stamina-value">100</strong>
         </div>
 
+      </header>
 
-        <!-- 모바일 조작 버튼 -->
-        <div class="mobile-controls" aria-label="모바일 이동 조작">
+      <div class="game-layout">
+
+        <!-- 왼쪽 퀘스트 창 -->
+        <aside class="side-panel left pixel-panel">
+
+          <h2>오늘의 연구</h2>
+          <div id="quest-card"></div>
+
+          <h2>일일 의뢰</h2>
+          <div id="daily-card"></div>
+
+          <div class="key-guide">
+            <span>이동: WASD 또는 방향키</span>
+            <span>조사: SPACE 또는 E</span>
+            <span>달리기: SHIFT</span>
+          </div>
+
+        </aside>
+
+        <!-- 게임 지도 -->
+        <div id="canvas-wrap">
+
+          <canvas
+            id="game-canvas"
+            width="768"
+            height="432"
+            aria-label="BIO LAB 연구소 지도"
+          ></canvas>
+
+          <div
+            id="interaction-hint"
+            class="interaction-hint hidden"
+          >
+            SPACE 조사
+          </div>
+
+          <div
+            id="zone-banner"
+            class="zone-banner hidden"
+          ></div>
+
+          <div
+            id="toast"
+            class="toast hidden"
+            role="status"
+          ></div>
+
+        </div>
+
+        <!-- 오른쪽 정보창 -->
+        <aside class="side-panel right pixel-panel">
+
+          <nav
+            class="tab-buttons"
+            aria-label="게임 메뉴"
+          >
+            <button
+              class="tab active"
+              data-tab="bag"
+              type="button"
+            >
+              가방
+            </button>
+
+            <button
+              class="tab"
+              data-tab="people"
+              type="button"
+            >
+              관계
+            </button>
+
+            <button
+              class="tab"
+              data-tab="lab"
+              type="button"
+            >
+              연구
+            </button>
+          </nav>
+
+          <div id="side-content"></div>
 
           <button
-            id="move-up"
-            class="direction-button up-button"
+            id="save-btn"
+            class="pixel-button small"
             type="button"
-            aria-label="위로 이동"
+          >
+            저장
+          </button>
+
+        </aside>
+
+      </div>
+
+      <!-- 아이패드 및 모바일 조작 버튼 -->
+      <div
+        id="mobile-controls"
+        aria-label="모바일 조작"
+      >
+
+        <div class="dpad">
+
+          <button
+            data-key="ArrowUp"
+            class="up"
+            aria-label="위"
           >
             ▲
           </button>
 
           <button
-            id="move-left"
-            class="direction-button left-button"
-            type="button"
-            aria-label="왼쪽으로 이동"
+            data-key="ArrowLeft"
+            class="left"
+            aria-label="왼쪽"
           >
             ◀
           </button>
 
           <button
-            id="move-down"
-            class="direction-button down-button"
-            type="button"
-            aria-label="아래로 이동"
+            data-key="ArrowDown"
+            class="down"
+            aria-label="아래"
           >
             ▼
           </button>
 
           <button
-            id="move-right"
-            class="direction-button right-button"
-            type="button"
-            aria-label="오른쪽으로 이동"
+            data-key="ArrowRight"
+            class="right"
+            aria-label="오른쪽"
           >
             ▶
           </button>
 
-          <button
-            id="mobile-action-button"
-            class="action-button"
-            type="button"
-            aria-label="상호작용"
-          >
-            A
-          </button>
-
         </div>
-
-      </section>
-
-
-      <!-- 퀘스트 패널 -->
-      <aside class="quest-panel">
-
-        <p class="section-label">
-          MAIN QUEST · DAY
-          <span id="quest-day">1</span>
-        </p>
-
-        <h2 id="quest-title">
-          DNA 샘플 복구
-        </h2>
-
-        <span id="quest-area" class="area-label">
-          기초 연구동
-        </span>
-
-        <p id="quest-description">
-          선배 연구원 미나에게 말을 걸어 DNA 퀴즈를 해결하세요.
-        </p>
-
-        <div class="quest-progress">
-          <div id="quest-progress-bar"></div>
-        </div>
-
-        <p id="quest-status" class="quest-status">
-          진행 중
-        </p>
-
-        <section class="quick-menu">
-
-          <button
-            id="open-greenhouse-button"
-            class="quick-menu-button"
-            type="button"
-          >
-            <span aria-hidden="true">🌱</span>
-            온실
-          </button>
-
-          <button
-            id="open-equipment-button"
-            class="quick-menu-button"
-            type="button"
-          >
-            <span aria-hidden="true">🔬</span>
-            장비
-          </button>
-
-          <button
-            id="open-notebook-button"
-            class="quick-menu-button"
-            type="button"
-          >
-            <span aria-hidden="true">📖</span>
-            도감
-          </button>
-
-        </section>
 
         <button
-          id="end-day-button"
-          class="pixel-button primary-button end-day-button hidden"
+          id="mobile-action"
+          class="action-button"
           type="button"
         >
-          연구 일지 작성 후 취침
+          조사
         </button>
 
-        <div id="project-complete" class="project-complete hidden">
-          <strong>봄 연구 프로젝트 완료!</strong>
-          <p>축하합니다. BIO LAB의 첫 연구를 성공적으로 마쳤습니다.</p>
-        </div>
-
-      </aside>
+      </div>
 
     </section>
-
   </main>
 
-
-  <!-- ==================================================
-       4. NPC 대화창
-  =================================================== -->
-  <section
-    id="dialogue-modal"
+  <!-- 대화·퀴즈·실험창 -->
+  <div
+    id="modal"
     class="modal hidden"
     role="dialog"
     aria-modal="true"
-    aria-labelledby="dialogue-name"
+    aria-labelledby="modal-title"
   >
+    <div class="modal-card pixel-panel">
 
-    <div class="modal-window dialogue-window">
+      <div class="modal-head">
 
-      <header class="dialogue-header">
-
-        <div class="npc-portrait" aria-hidden="true">
-          <div class="npc-hair"></div>
-          <div class="npc-face"></div>
-          <div class="npc-coat"></div>
-        </div>
-
-        <div>
-          <p class="section-label">SENIOR RESEARCHER</p>
-          <h2 id="dialogue-name">미나 선배 연구원</h2>
-        </div>
-
-      </header>
-
-      <p id="dialogue-text" class="dialogue-text"></p>
-
-      <footer class="modal-actions">
+        <h2 id="modal-title">대화</h2>
 
         <button
-          id="dialogue-cancel-button"
-          class="pixel-button"
+          id="modal-close"
           type="button"
-        >
-          나중에
-        </button>
-
-        <button
-          id="accept-quest-button"
-          class="pixel-button primary-button"
-          type="button"
-        >
-          퀘스트 수락
-        </button>
-
-      </footer>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       5. 퀴즈창
-  =================================================== -->
-  <section
-    id="quiz-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="quiz-title"
-  >
-
-    <div class="modal-window quiz-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">BIO QUIZ</p>
-          <h2 id="quiz-title">생명공학 연구 퀴즈</h2>
-        </div>
-
-        <button
-          id="close-quiz-button"
-          class="close-button"
-          type="button"
-          aria-label="퀴즈창 닫기"
+          aria-label="닫기"
         >
           ×
-        </button>
-
-      </header>
-
-      <p id="quiz-question" class="quiz-question"></p>
-
-      <div
-        id="quiz-answer-list"
-        class="quiz-answer-list"
-        role="radiogroup"
-        aria-label="정답 선택"
-      ></div>
-
-      <section
-        id="quiz-feedback"
-        class="quiz-feedback hidden"
-        aria-live="polite"
-      >
-        <strong id="quiz-feedback-title"></strong>
-        <p id="quiz-feedback-text"></p>
-      </section>
-
-      <button
-        id="submit-answer-button"
-        class="pixel-button primary-button full-button"
-        type="button"
-      >
-        정답 제출
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       6. 온실창
-  =================================================== -->
-  <section
-    id="greenhouse-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="greenhouse-title"
-  >
-
-    <div class="modal-window greenhouse-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">BIO GREENHOUSE</p>
-          <h2 id="greenhouse-title">바이오 온실</h2>
-        </div>
-
-        <button
-          id="close-greenhouse-button"
-          class="close-button"
-          type="button"
-          aria-label="온실창 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <p class="modal-description">
-        씨앗을 심고 물과 생장조절물질을 사용해 식물의 변화를 관찰하세요.
-      </p>
-
-      <div id="plot-list" class="plot-list"></div>
-
-      <section id="empty-plot-panel" class="plot-detail-panel">
-
-        <h3>심을 종자를 선택하세요</h3>
-
-        <p>
-          종자를 심을 때 실험 재료 1개가 사용됩니다.
-        </p>
-
-        <div id="seed-list" class="seed-list"></div>
-
-      </section>
-
-      <section id="crop-control-panel" class="plot-detail-panel hidden">
-
-        <div class="crop-information">
-
-          <span id="selected-crop-icon" class="large-crop-icon">🌱</span>
-
-          <div>
-            <h3 id="selected-crop-name">애기장대</h3>
-            <p id="selected-crop-status">0일 성장</p>
-          </div>
-
-        </div>
-
-        <div class="crop-actions">
-
-          <button
-            id="water-crop-button"
-            class="pixel-button"
-            type="button"
-          >
-            💧 물주기
-          </button>
-
-          <button
-            id="harvest-crop-button"
-            class="pixel-button primary-button hidden"
-            type="button"
-          >
-            수확하기
-          </button>
-
-        </div>
-
-        <label class="treatment-label">
-
-          <span>처리할 용액</span>
-
-          <select id="treatment-select"></select>
-
-        </label>
-
-        <section class="learning-note">
-
-          <strong>관찰 원리</strong>
-          <p id="treatment-explanation"></p>
-
-        </section>
-
-      </section>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       7. 배양 관찰창
-  =================================================== -->
-  <section
-    id="culture-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="culture-title"
-  >
-
-    <div class="modal-window culture-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">CULTURE LAB</p>
-          <h2 id="culture-title">배양 관찰대</h2>
-        </div>
-
-        <button
-          id="close-culture-button"
-          class="close-button"
-          type="button"
-          aria-label="배양창 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <div id="petri-dish" class="petri-dish" aria-hidden="true">
-
-        <span class="colony colony-one"></span>
-        <span class="colony colony-two"></span>
-        <span class="colony colony-three"></span>
-        <span class="colony colony-four"></span>
-        <span class="colony colony-five"></span>
-
-      </div>
-
-      <h3 id="culture-status-title">
-        아직 배양 키트가 없습니다.
-      </h3>
-
-      <p id="culture-status-text">
-        DAY 3 퀘스트를 해결하면 효모 배양을 시작할 수 있습니다.
-      </p>
-
-      <section class="learning-note">
-
-        <strong>배양 연구 원칙</strong>
-
-        <p>
-          배지는 생물의 생장에 필요한 영양분을 제공합니다.
-          적절한 온도와 위생적인 조작은 안정적인 배양에 중요합니다.
-        </p>
-
-      </section>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       8. 연구 장비 상점
-  =================================================== -->
-  <section
-    id="equipment-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="equipment-title"
-  >
-
-    <div class="modal-window equipment-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">LAB EQUIPMENT</p>
-          <h2 id="equipment-title">연구 장비 상점</h2>
-        </div>
-
-        <button
-          id="close-equipment-button"
-          class="close-button"
-          type="button"
-          aria-label="장비 상점 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <p>
-        보유 연구 포인트:
-        <strong><span id="shop-rp-count">0</span> RP</strong>
-      </p>
-
-      <div id="equipment-list" class="equipment-list"></div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       9. 연구 도감
-  =================================================== -->
-  <section
-    id="notebook-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="notebook-title"
-  >
-
-    <div class="modal-window notebook-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">RESEARCH RECORD</p>
-          <h2 id="notebook-title">연구 도감</h2>
-        </div>
-
-        <button
-          id="close-notebook-button"
-          class="close-button"
-          type="button"
-          aria-label="연구 도감 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <p>
-        발견한 생명공학 개념:
-        <strong>
-          <span id="notebook-count">0</span>/7
-        </strong>
-      </p>
-
-      <div id="notebook-list" class="notebook-list">
-
-        <p id="empty-notebook-message" class="empty-message">
-          퀘스트를 해결하면 실험 결과와 학습 내용이 기록됩니다.
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       10. 플레이 방법
-  =================================================== -->
-  <section
-    id="help-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="help-title"
-  >
-
-    <div class="modal-window help-window">
-
-      <header class="modal-header">
-
-        <div>
-          <p class="section-label">HOW TO PLAY</p>
-          <h2 id="help-title">플레이 방법</h2>
-        </div>
-
-        <button
-          id="close-help-button"
-          class="close-button"
-          type="button"
-          aria-label="도움말 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <ol class="help-list">
-
-        <li>
-          방향키 또는 WASD를 사용해 연구원을 이동합니다.
-        </li>
-
-        <li>
-          NPC나 연구 시설에 가까이 가면 상호작용 표시가 나타납니다.
-        </li>
-
-        <li>
-          키보드의 Spacebar 또는 모바일의 A 버튼을 누릅니다.
-        </li>
-
-        <li>
-          생명공학 퀴즈를 해결해 연구 포인트와 실험 재료를 얻습니다.
-        </li>
-
-        <li>
-          온실에서 식물을 심고 물과 생장조절물질을 사용합니다.
-        </li>
-
-        <li>
-          연구 포인트로 장비를 구매해 새로운 연구 시설을 해금합니다.
-        </li>
-
-        <li>
-          하루의 퀘스트를 완료하면 취침하고 다음 날로 이동할 수 있습니다.
-        </li>
-
-      </ol>
-
-      <section class="learning-note">
-
-        <strong>자동 저장</strong>
-
-        <p>
-          캐릭터, 연구 포인트, 식물, 장비와 퀘스트 진행 상황은
-          현재 브라우저에 자동으로 저장됩니다.
-        </p>
-
-      </section>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       11. 게임 메뉴
-  =================================================== -->
-  <section
-    id="menu-modal"
-    class="modal hidden"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="menu-title"
-  >
-
-    <div class="modal-window menu-window">
-
-      <header class="modal-header">
-
-        <h2 id="menu-title">연구소 메뉴</h2>
-
-        <button
-          id="close-menu-button"
-          class="close-button"
-          type="button"
-          aria-label="메뉴 닫기"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <div class="menu-button-list">
-
-        <button
-          id="return-title-button"
-          class="pixel-button"
-          type="button"
-        >
-          타이틀 화면으로
-        </button>
-
-        <button
-          id="reset-game-button"
-          class="pixel-button danger-button"
-          type="button"
-        >
-          저장 데이터 초기화
         </button>
 
       </div>
 
+      <div id="modal-content"></div>
+
     </div>
+  </div>
 
-  </section>
-
-
-  <!-- 게임 데이터와 실행 코드 -->
+  <!-- quest.js가 반드시 main.js보다 먼저 와야 합니다 -->
   <script src="quest.js"></script>
   <script src="main.js"></script>
-
 </body>
 </html>
