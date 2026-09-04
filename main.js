@@ -4969,4 +4969,2105 @@
       ctx.stroke();
     }
   }
+    /* ==================================================
+     BIO LAB — DETAILED WARM PIXEL MAP
+     기존 게임 구조를 유지하는 그래픽 개선 패치
+  ================================================== */
+
+  function drawGround() {
+    ctx.fillStyle = "#74aa4f";
+    ctx.fillRect(0, 0, WORLD.width, WORLD.height);
+
+    /* 작은 잔디 타일 */
+    for (let y = 0; y < WORLD.height; y += 16) {
+      for (let x = 0; x < WORLD.width; x += 16) {
+        const pattern =
+          ((x / 16) * 13 +
+            (y / 16) * 19) %
+          17;
+
+        if (pattern < 3) {
+          ctx.fillStyle = "#80b65a";
+          ctx.fillRect(x + 2, y + 3, 3, 3);
+          ctx.fillRect(x + 7, y + 1, 2, 5);
+        }
+
+        if (pattern === 4) {
+          ctx.fillStyle = "#5f963f";
+          ctx.fillRect(x + 3, y + 9, 3, 5);
+          ctx.fillRect(x + 8, y + 7, 3, 7);
+        }
+
+        if (pattern === 7) {
+          ctx.fillStyle = "#a0cc68";
+          ctx.fillRect(x + 5, y + 5, 3, 3);
+        }
+
+        if (pattern === 11) {
+          ctx.fillStyle = "#f1df72";
+          ctx.fillRect(x + 6, y + 5, 3, 3);
+          ctx.fillStyle = "#fff3a5";
+          ctx.fillRect(x + 7, y + 4, 1, 1);
+        }
+      }
+    }
+
+    /* 세로 흙길 */
+    drawDirtPath(
+      635,
+      0,
+      62,
+      WORLD.height
+    );
+
+    drawDirtPath(
+      815,
+      135,
+      72,
+      980
+    );
+
+    /* 가로 흙길 */
+    drawDirtPath(
+      0,
+      570,
+      WORLD.width,
+      78
+    );
+
+    drawDirtPath(
+      630,
+      285,
+      790,
+      62
+    );
+
+    /* 길 가장자리 작은 돌 */
+    for (let y = 20; y < WORLD.height; y += 72) {
+      drawPebble(630, y);
+      drawPebble(701, y + 31);
+    }
+
+    for (let x = 24; x < WORLD.width; x += 88) {
+      drawPebble(x, 566);
+      drawPebble(x + 42, 650);
+    }
+  }
+
+  function drawDirtPath(x, y, width, height) {
+    ctx.fillStyle = "#c9974d";
+    ctx.fillRect(x, y, width, height);
+
+    ctx.fillStyle = "#d9aa5d";
+    ctx.fillRect(
+      x + 4,
+      y + 4,
+      width - 8,
+      height - 8
+    );
+
+    for (
+      let yy = y + 9;
+      yy < y + height - 7;
+      yy += 21
+    ) {
+      for (
+        let xx = x + 7;
+        xx < x + width - 7;
+        xx += 27
+      ) {
+        const offset =
+          ((xx + yy) / 3) % 9;
+
+        ctx.fillStyle =
+          offset < 4
+            ? "#bd873e"
+            : "#e3b86d";
+
+        ctx.fillRect(
+          xx + (offset % 4),
+          yy,
+          4,
+          3
+        );
+      }
+    }
+  }
+
+  function drawPebble(x, y) {
+    ctx.fillStyle = "#786c55";
+    ctx.fillRect(x, y + 3, 8, 5);
+
+    ctx.fillStyle = "#b1a276";
+    ctx.fillRect(x + 2, y + 1, 5, 5);
+
+    ctx.fillStyle = "#d2c18b";
+    ctx.fillRect(x + 3, y + 1, 2, 2);
+  }
+
+  function drawRegions() {
+    /* 연구 연못 */
+    ctx.fillStyle = "#315e5d";
+    ellipse(330, 304, 229, 149);
+
+    ctx.fillStyle = "#417f84";
+    ellipse(330, 299, 212, 132);
+
+    ctx.fillStyle = "#5da2a0";
+    ellipse(330, 293, 193, 113);
+
+    ctx.fillStyle = "#8dc9b8";
+
+    for (let i = 0; i < 9; i++) {
+      ctx.fillRect(
+        203 + i * 36,
+        262 + (i % 3) * 23,
+        19,
+        4
+      );
+    }
+
+    /* 수련잎 */
+    for (let i = 0; i < 6; i++) {
+      const x = 240 + i * 43;
+      const y = 320 + (i % 2) * 30;
+
+      ctx.fillStyle = "#376f43";
+      ctx.fillRect(x, y, 17, 10);
+
+      ctx.fillStyle = "#63a954";
+      ctx.fillRect(x + 3, y - 3, 11, 11);
+
+      if (i % 2 === 0) {
+        ctx.fillStyle = "#f0a8b1";
+        ctx.fillRect(x + 7, y - 6, 5, 5);
+      }
+    }
+
+    /* 연못 주변 갈대 */
+    for (let i = 0; i < 11; i++) {
+      const x = 145 + i * 37;
+      const y = 410 + (i % 2) * 8;
+
+      ctx.fillStyle = "#426936";
+      ctx.fillRect(x, y - 17, 3, 18);
+      ctx.fillRect(x + 7, y - 12, 3, 13);
+
+      ctx.fillStyle = "#90622d";
+      ctx.fillRect(x - 1, y - 21, 5, 7);
+    }
+
+    /* 중앙 연구소 */
+    drawPixelBuilding(
+      700,
+      350,
+      310,
+      245,
+      {
+        wall: "#d7b674",
+        wallLight: "#ebcf91",
+        roof: "#a84f37",
+        roofLight: "#d46d47",
+        trim: "#633b27",
+        door: "#5b3829",
+        window: "#70aeb1",
+        sign: "CENTRAL LAB"
+      }
+    );
+
+    /* 분자생물학 연구소 */
+    drawPixelBuilding(
+      280,
+      670,
+      390,
+      250,
+      {
+        wall: "#91b8af",
+        wallLight: "#b8d5c4",
+        roof: "#365f65",
+        roofLight: "#4c7f82",
+        trim: "#29484d",
+        door: "#51392d",
+        window: "#9dd7cf",
+        sign: "MOLECULAR LAB"
+      }
+    );
+
+    /* 스마트 온실 */
+    drawGreenhouse(
+      1215,
+      225,
+      420,
+      325
+    );
+
+    /* 시험 재배지 */
+    drawFarmArea();
+
+    /* 생활관 */
+    drawPixelBuilding(
+      900,
+      940,
+      250,
+      170,
+      {
+        wall: "#d7aa69",
+        wallLight: "#ebc680",
+        roof: "#884634",
+        roofLight: "#b85d40",
+        trim: "#563424",
+        door: "#633e2d",
+        window: "#7eafb0",
+        sign: "DORM"
+      }
+    );
+
+    /* 보급소 */
+    drawPixelBuilding(
+      920,
+      145,
+      225,
+      145,
+      {
+        wall: "#d6a45e",
+        wallLight: "#eac47d",
+        roof: "#874431",
+        roofLight: "#bd603b",
+        trim: "#573421",
+        door: "#5d3826",
+        window: "#78a9a4",
+        sign: "SUPPLY"
+      }
+    );
+
+    /* 울타리 */
+    drawFence(1190, 190, 475, true);
+    drawFence(1190, 1048, 565, true);
+    drawFence(1185, 205, 835, false);
+    drawFence(1750, 205, 835, false);
+
+    /* 꽃밭 */
+    drawFlowerPatch(1080, 410, 5);
+    drawFlowerPatch(1090, 760, 7);
+    drawFlowerPatch(750, 875, 6);
+    drawFlowerPatch(1030, 1110, 5);
+  }
+
+  function drawPixelBuilding(
+    x,
+    y,
+    width,
+    height,
+    colors
+  ) {
+    const roofHeight = Math.min(
+      75,
+      Math.floor(height * 0.32)
+    );
+
+    /* 건물 그림자 */
+    ctx.fillStyle = "rgba(50,35,22,.28)";
+    ctx.fillRect(
+      x + 15,
+      y + height + 6,
+      width,
+      14
+    );
+
+    /* 벽 외곽 */
+    ctx.fillStyle = colors.trim;
+    ctx.fillRect(
+      x - 8,
+      y + roofHeight - 5,
+      width + 16,
+      height - roofHeight + 13
+    );
+
+    ctx.fillStyle = colors.wall;
+    ctx.fillRect(
+      x,
+      y + roofHeight,
+      width,
+      height - roofHeight
+    );
+
+    /* 나무 벽 타일 */
+    for (
+      let wallX = x + 7;
+      wallX < x + width - 5;
+      wallX += 18
+    ) {
+      ctx.fillStyle = colors.wallLight;
+      ctx.fillRect(
+        wallX,
+        y + roofHeight + 8,
+        4,
+        height - roofHeight - 15
+      );
+    }
+
+    /* 삼각형 느낌의 계단형 지붕 */
+    for (
+      let row = 0;
+      row < roofHeight;
+      row += 6
+    ) {
+      const inset = Math.floor(
+        (roofHeight - row) * 0.72
+      );
+
+      ctx.fillStyle =
+        row % 12 === 0
+          ? colors.roofLight
+          : colors.roof;
+
+      ctx.fillRect(
+        x + inset,
+        y + row,
+        width - inset * 2,
+        7
+      );
+    }
+
+    /* 지붕 아래 그림자 */
+    ctx.fillStyle = colors.trim;
+    ctx.fillRect(
+      x - 7,
+      y + roofHeight - 1,
+      width + 14,
+      11
+    );
+
+    /* 지붕 타일선 */
+    ctx.fillStyle = "rgba(78,39,29,.35)";
+
+    for (
+      let roofX = x + 18;
+      roofX < x + width - 10;
+      roofX += 28
+    ) {
+      ctx.fillRect(
+        roofX,
+        y + roofHeight - 24,
+        4,
+        22
+      );
+    }
+
+    /* 출입문 */
+    const doorX =
+      x + Math.floor(width / 2) - 21;
+
+    ctx.fillStyle = colors.trim;
+    ctx.fillRect(
+      doorX - 5,
+      y + height - 69,
+      52,
+      69
+    );
+
+    ctx.fillStyle = colors.door;
+    ctx.fillRect(
+      doorX,
+      y + height - 64,
+      42,
+      64
+    );
+
+    ctx.fillStyle = "#92613d";
+    ctx.fillRect(
+      doorX + 7,
+      y + height - 57,
+      28,
+      17
+    );
+
+    ctx.fillStyle = "#e1b653";
+    ctx.fillRect(
+      doorX + 31,
+      y + height - 31,
+      5,
+      5
+    );
+
+    /* 창문 */
+    drawWindow(
+      x + 28,
+      y + roofHeight + 35,
+      colors.window,
+      colors.trim
+    );
+
+    drawWindow(
+      x + width - 72,
+      y + roofHeight + 35,
+      colors.window,
+      colors.trim
+    );
+
+    /* 간판 */
+    ctx.fillStyle = colors.trim;
+    ctx.fillRect(
+      x + 20,
+      y + roofHeight + 8,
+      width - 40,
+      25
+    );
+
+    drawLabel(
+      colors.sign,
+      x + 30,
+      y + roofHeight + 26,
+      "#fff0b1"
+    );
+
+    /* 굴뚝 */
+    ctx.fillStyle = "#4d4540";
+    ctx.fillRect(
+      x + width - 58,
+      y + 7,
+      26,
+      47
+    );
+
+    ctx.fillStyle = "#796d61";
+    ctx.fillRect(
+      x + width - 53,
+      y + 3,
+      17,
+      42
+    );
+
+    ctx.fillStyle = "#393532";
+    ctx.fillRect(
+      x + width - 58,
+      y,
+      27,
+      8
+    );
+  }
+
+  function drawWindow(x, y, glass, frame) {
+    ctx.fillStyle = frame;
+    ctx.fillRect(x, y, 48, 43);
+
+    ctx.fillStyle = glass;
+    ctx.fillRect(
+      x + 6,
+      y + 6,
+      36,
+      31
+    );
+
+    ctx.fillStyle = "#d4f0d2";
+    ctx.fillRect(
+      x + 9,
+      y + 8,
+      10,
+      9
+    );
+
+    ctx.fillStyle = frame;
+    ctx.fillRect(
+      x + 22,
+      y + 5,
+      4,
+      34
+    );
+
+    ctx.fillRect(
+      x + 5,
+      y + 20,
+      38,
+      4
+    );
+  }
+
+  function drawGreenhouse(
+    x,
+    y,
+    width,
+    height
+  ) {
+    ctx.fillStyle = "rgba(42,54,34,.3)";
+    ctx.fillRect(
+      x + 14,
+      y + height + 7,
+      width,
+      13
+    );
+
+    ctx.fillStyle = "#315c46";
+    ctx.fillRect(
+      x - 8,
+      y + 58,
+      width + 16,
+      height - 50
+    );
+
+    ctx.fillStyle = "#8fc9aa";
+    ctx.fillRect(
+      x,
+      y + 65,
+      width,
+      height - 65
+    );
+
+    /* 유리 지붕 */
+    for (let row = 0; row < 66; row += 6) {
+      const inset =
+        Math.floor((66 - row) * 0.8);
+
+      ctx.fillStyle =
+        row % 12 === 0
+          ? "#d7edbd"
+          : "#9fd6ad";
+
+      ctx.fillRect(
+        x + inset,
+        y + row,
+        width - inset * 2,
+        7
+      );
+    }
+
+    /* 유리 반사 */
+    ctx.fillStyle =
+      "rgba(237,255,214,.48)";
+
+    for (
+      let panelX = x + 26;
+      panelX < x + width - 20;
+      panelX += 67
+    ) {
+      ctx.fillRect(
+        panelX,
+        y + 75,
+        9,
+        height - 92
+      );
+    }
+
+    /* 온실 골조 */
+    ctx.fillStyle = "#416e55";
+
+    for (
+      let panelX = x;
+      panelX <= x + width;
+      panelX += 66
+    ) {
+      ctx.fillRect(
+        panelX,
+        y + 62,
+        6,
+        height - 62
+      );
+    }
+
+    ctx.fillRect(
+      x,
+      y + 157,
+      width,
+      6
+    );
+
+    ctx.fillRect(
+      x,
+      y + 245,
+      width,
+      6
+    );
+
+    /* 온실 내부 화단 */
+    for (let row = 0; row < 3; row++) {
+      ctx.fillStyle = "#745132";
+      ctx.fillRect(
+        x + 31,
+        y + 105 + row * 73,
+        width - 62,
+        29
+      );
+
+      for (let i = 0; i < 9; i++) {
+        const plantX =
+          x + 47 + i * 39;
+
+        const plantY =
+          y + 102 + row * 73;
+
+        ctx.fillStyle = "#315f3a";
+        ctx.fillRect(
+          plantX,
+          plantY - 10,
+          4,
+          13
+        );
+
+        ctx.fillStyle =
+          (i + row) % 3 === 0
+            ? "#e28c73"
+            : "#70ad50";
+
+        ctx.fillRect(
+          plantX - 5,
+          plantY - 14,
+          7,
+          7
+        );
+
+        ctx.fillRect(
+          plantX + 3,
+          plantY - 18,
+          7,
+          7
+        );
+      }
+    }
+
+    /* 온실 문 */
+    ctx.fillStyle = "#315b47";
+    ctx.fillRect(
+      x + width / 2 - 29,
+      y + height - 75,
+      58,
+      75
+    );
+
+    ctx.fillStyle = "#95cdb1";
+    ctx.fillRect(
+      x + width / 2 - 21,
+      y + height - 67,
+      42,
+      67
+    );
+
+    drawLabel(
+      "SMART GREENHOUSE",
+      x + 98,
+      y + 87,
+      "#254532"
+    );
+  }
+
+  function drawFarmArea() {
+    ctx.fillStyle = "#765037";
+    ctx.fillRect(
+      1215,
+      600,
+      530,
+      420
+    );
+
+    ctx.fillStyle = "#9b683f";
+    ctx.fillRect(
+      1224,
+      609,
+      512,
+      402
+    );
+
+    /* 밭고랑 */
+    for (
+      let row = 0;
+      row < 7;
+      row++
+    ) {
+      const y = 626 + row * 56;
+
+      ctx.fillStyle = "#69452f";
+      ctx.fillRect(
+        1237,
+        y,
+        486,
+        29
+      );
+
+      ctx.fillStyle = "#b47b47";
+      ctx.fillRect(
+        1237,
+        y,
+        486,
+        6
+      );
+
+      ctx.fillStyle = "#855938";
+
+      for (
+        let x = 1245;
+        x < 1710;
+        x += 21
+      ) {
+        ctx.fillRect(
+          x,
+          y + 14,
+          9,
+          3
+        );
+      }
+    }
+
+    drawLabel(
+      "TEST FIELD",
+      1412,
+      1001,
+      "#ffe8a1"
+    );
+  }
+
+  function drawFence(
+    x,
+    y,
+    length,
+    horizontal
+  ) {
+    ctx.fillStyle = "#593823";
+
+    if (horizontal) {
+      for (
+        let fenceX = x;
+        fenceX < x + length;
+        fenceX += 34
+      ) {
+        ctx.fillRect(
+          fenceX,
+          y - 7,
+          9,
+          29
+        );
+
+        ctx.fillStyle = "#986039";
+        ctx.fillRect(
+          fenceX + 2,
+          y - 5,
+          4,
+          24
+        );
+
+        ctx.fillStyle = "#593823";
+      }
+
+      ctx.fillRect(
+        x,
+        y + 1,
+        length,
+        7
+      );
+
+      ctx.fillRect(
+        x,
+        y + 13,
+        length,
+        6
+      );
+    } else {
+      for (
+        let fenceY = y;
+        fenceY < y + length;
+        fenceY += 34
+      ) {
+        ctx.fillRect(
+          x - 7,
+          fenceY,
+          29,
+          9
+        );
+
+        ctx.fillStyle = "#986039";
+        ctx.fillRect(
+          x - 5,
+          fenceY + 2,
+          24,
+          4
+        );
+
+        ctx.fillStyle = "#593823";
+      }
+
+      ctx.fillRect(
+        x + 1,
+        y,
+        7,
+        length
+      );
+
+      ctx.fillRect(
+        x + 13,
+        y,
+        6,
+        length
+      );
+    }
+  }
+
+  function drawFlowerPatch(
+    x,
+    y,
+    amount
+  ) {
+    const colors = [
+      "#edc75f",
+      "#e9868f",
+      "#d6a1df",
+      "#f3eee0",
+      "#de7954"
+    ];
+
+    for (let i = 0; i < amount; i++) {
+      const flowerX =
+        x + (i % 4) * 17;
+
+      const flowerY =
+        y + Math.floor(i / 4) * 18;
+
+      ctx.fillStyle = "#3c763e";
+      ctx.fillRect(
+        flowerX + 4,
+        flowerY + 7,
+        3,
+        9
+      );
+
+      ctx.fillStyle =
+        colors[i % colors.length];
+
+      ctx.fillRect(
+        flowerX + 1,
+        flowerY + 2,
+        5,
+        5
+      );
+
+      ctx.fillRect(
+        flowerX + 6,
+        flowerY,
+        5,
+        5
+      );
+
+      ctx.fillStyle = "#f7d75c";
+      ctx.fillRect(
+        flowerX + 5,
+        flowerY + 4,
+        3,
+        3
+      );
+    }
+  }
+
+  function drawTrees() {
+    treePositions.forEach(
+      (tree, index) => {
+        /* 나무 그림자 */
+        ctx.fillStyle =
+          "rgba(36,52,28,.25)";
+
+        ctx.fillRect(
+          tree.x - 27,
+          tree.y + 23,
+          58,
+          10
+        );
+
+        /* 줄기 */
+        ctx.fillStyle = "#4a2d1d";
+
+        ctx.fillRect(
+          tree.x - 9,
+          tree.y - 4,
+          18,
+          39
+        );
+
+        ctx.fillStyle = "#805033";
+
+        ctx.fillRect(
+          tree.x - 5,
+          tree.y - 4,
+          7,
+          36
+        );
+
+        ctx.fillStyle = "#a16a3d";
+
+        ctx.fillRect(
+          tree.x - 3,
+          tree.y + 2,
+          3,
+          18
+        );
+
+        /* 나뭇잎 바깥쪽 */
+        ctx.fillStyle = "#254e31";
+
+        ctx.fillRect(
+          tree.x - 30,
+          tree.y - 35,
+          60,
+          33
+        );
+
+        ctx.fillRect(
+          tree.x - 23,
+          tree.y - 50,
+          46,
+          21
+        );
+
+        /* 중간 잎 */
+        ctx.fillStyle =
+          index % 3 === 0
+            ? "#438345"
+            : "#39773e";
+
+        ctx.fillRect(
+          tree.x - 24,
+          tree.y - 41,
+          48,
+          34
+        );
+
+        ctx.fillRect(
+          tree.x - 17,
+          tree.y - 57,
+          34,
+          25
+        );
+
+        /* 밝은 잎 */
+        ctx.fillStyle =
+          index % 4 === 0
+            ? "#70aa4e"
+            : "#589849";
+
+        ctx.fillRect(
+          tree.x - 17,
+          tree.y - 47,
+          16,
+          13
+        );
+
+        ctx.fillRect(
+          tree.x + 5,
+          tree.y - 34,
+          13,
+          11
+        );
+
+        ctx.fillRect(
+          tree.x - 8,
+          tree.y - 57,
+          12,
+          9
+        );
+
+        /* 작은 열매 */
+        if (index % 5 === 0) {
+          ctx.fillStyle = "#d9664e";
+
+          ctx.fillRect(
+            tree.x - 15,
+            tree.y - 25,
+            5,
+            5
+          );
+
+          ctx.fillRect(
+            tree.x + 11,
+            tree.y - 39,
+            5,
+            5
+          );
+        }
+      }
+    );
+  }
+    function drawSamples() {
+    baseSamples.forEach(
+      (item, index) => {
+        if (
+          state.collectedToday.includes(
+            item.key
+          )
+        ) {
+          return;
+        }
+
+        const sample = DATA.samples.find(
+          entry =>
+            entry.id === item.sample
+        );
+
+        const pulse =
+          1 +
+          Math.floor(
+            (Math.sin(
+              performance.now() / 280 +
+                item.x
+            ) +
+              1) *
+              1.5
+          );
+
+        /* 표본 주위 빛 */
+        ctx.fillStyle =
+          "rgba(255,238,129,.18)";
+
+        ctx.fillRect(
+          item.x - 13 - pulse,
+          item.y - 14 - pulse,
+          27 + pulse * 2,
+          28 + pulse * 2
+        );
+
+        /* 줄기 */
+        ctx.fillStyle = "#315f38";
+
+        ctx.fillRect(
+          item.x - 2,
+          item.y - 2,
+          4,
+          13
+        );
+
+        /* 잎 */
+        ctx.fillStyle = sample.color;
+
+        ctx.fillRect(
+          item.x - 10,
+          item.y - 7,
+          9,
+          8
+        );
+
+        ctx.fillRect(
+          item.x + 1,
+          item.y - 12,
+          10,
+          9
+        );
+
+        ctx.fillStyle = "#b8d878";
+
+        ctx.fillRect(
+          item.x - 7,
+          item.y - 6,
+          4,
+          3
+        );
+
+        ctx.fillRect(
+          item.x + 4,
+          item.y - 10,
+          4,
+          3
+        );
+
+        /* 일부 표본의 꽃 또는 버섯 */
+        if (index % 3 === 0) {
+          ctx.fillStyle = "#ec9b8d";
+
+          ctx.fillRect(
+            item.x - 4,
+            item.y - 15,
+            8,
+            6
+          );
+
+          ctx.fillStyle = "#f5df72";
+
+          ctx.fillRect(
+            item.x - 1,
+            item.y - 13,
+            3,
+            3
+          );
+        }
+      }
+    );
+  }
+
+  function drawPlots() {
+    for (
+      let i = 0;
+      i < state.unlockedPlots;
+      i++
+    ) {
+      const position =
+        plotPosition(i);
+
+      const plot =
+        state.plots[i];
+
+      /* 밭 그림자 */
+      ctx.fillStyle =
+        "rgba(55,34,23,.28)";
+
+      ctx.fillRect(
+        position.x - 37,
+        position.y - 25,
+        76,
+        61
+      );
+
+      /* 밭 외곽 */
+      ctx.fillStyle = "#543620";
+
+      ctx.fillRect(
+        position.x - 38,
+        position.y - 31,
+        76,
+        62
+      );
+
+      /* 흙 */
+      ctx.fillStyle = plot.watered
+        ? "#553c2d"
+        : "#795035";
+
+      ctx.fillRect(
+        position.x - 33,
+        position.y - 26,
+        66,
+        52
+      );
+
+      /* 밭고랑 */
+      ctx.fillStyle = plot.watered
+        ? "#73543d"
+        : "#a36d42";
+
+      for (
+        let row = -19;
+        row <= 19;
+        row += 13
+      ) {
+        ctx.fillRect(
+          position.x - 29,
+          position.y + row,
+          58,
+          4
+        );
+      }
+
+      /* 물 반짝임 */
+      if (plot.watered) {
+        ctx.fillStyle = "#789398";
+
+        ctx.fillRect(
+          position.x - 23,
+          position.y - 16,
+          10,
+          2
+        );
+
+        ctx.fillRect(
+          position.x + 8,
+          position.y + 11,
+          13,
+          2
+        );
+      }
+
+      if (!plot.crop) {
+        /* 비어 있는 밭의 작은 씨앗 표시 */
+        ctx.fillStyle = "#c79654";
+
+        ctx.fillRect(
+          position.x - 2,
+          position.y - 2,
+          4,
+          3
+        );
+
+        continue;
+      }
+
+      const crop = DATA.crops.find(
+        entry =>
+          entry.id === plot.crop
+      );
+
+      const stage = Math.min(
+        3,
+        Math.floor(
+          (plot.age / crop.grow) * 4
+        )
+      );
+
+      drawCropSprite(
+        position.x,
+        position.y,
+        crop,
+        stage,
+        plot.age >= crop.grow,
+        plot.health
+      );
+
+      /* 약품 처리 표시 */
+      if (plot.treatment) {
+        ctx.fillStyle =
+          "rgba(213,241,116,.38)";
+
+        ctx.fillRect(
+          position.x - 23,
+          position.y - 38,
+          46,
+          5
+        );
+
+        ctx.fillStyle = "#e8ee8a";
+
+        ctx.fillRect(
+          position.x - 4,
+          position.y - 42,
+          8,
+          8
+        );
+      }
+    }
+  }
+
+  function drawCropSprite(
+    x,
+    y,
+    crop,
+    stage,
+    ready,
+    health
+  ) {
+    const healthy =
+      health >= 50;
+
+    const leafColor = healthy
+      ? "#397745"
+      : "#8b7939";
+
+    const leafLight = healthy
+      ? "#69a84f"
+      : "#b09a4c";
+
+    /* 줄기 */
+    ctx.fillStyle = leafColor;
+
+    ctx.fillRect(
+      x - 3,
+      y - 8 - stage * 5,
+      6,
+      22 + stage * 5
+    );
+
+    if (stage >= 1) {
+      /* 왼쪽 잎 */
+      ctx.fillStyle = leafColor;
+
+      ctx.fillRect(
+        x - 16,
+        y - 6 - stage * 4,
+        14,
+        8
+      );
+
+      ctx.fillStyle = leafLight;
+
+      ctx.fillRect(
+        x - 13,
+        y - 8 - stage * 4,
+        9,
+        6
+      );
+
+      /* 오른쪽 잎 */
+      ctx.fillStyle = leafColor;
+
+      ctx.fillRect(
+        x + 2,
+        y - 15 - stage * 4,
+        15,
+        8
+      );
+
+      ctx.fillStyle = leafLight;
+
+      ctx.fillRect(
+        x + 4,
+        y - 17 - stage * 4,
+        9,
+        6
+      );
+    }
+
+    if (stage >= 2) {
+      ctx.fillStyle = leafColor;
+
+      ctx.fillRect(
+        x - 12,
+        y - 27 - stage * 3,
+        10,
+        8
+      );
+
+      ctx.fillRect(
+        x + 2,
+        y - 32 - stage * 2,
+        11,
+        8
+      );
+    }
+
+    if (stage === 0) {
+      ctx.fillStyle = "#6d9c48";
+
+      ctx.fillRect(
+        x - 7,
+        y - 4,
+        7,
+        6
+      );
+
+      ctx.fillRect(
+        x + 1,
+        y - 8,
+        7,
+        6
+      );
+    }
+
+    if (ready) {
+      /* 수확 가능한 열매나 꽃 */
+      ctx.fillStyle = crop.color;
+
+      ctx.fillRect(
+        x - 10,
+        y - 38,
+        9,
+        9
+      );
+
+      ctx.fillRect(
+        x + 2,
+        y - 43,
+        10,
+        10
+      );
+
+      ctx.fillRect(
+        x - 3,
+        y - 50,
+        9,
+        9
+      );
+
+      ctx.fillStyle = "#ffe593";
+
+      ctx.fillRect(
+        x,
+        y - 47,
+        3,
+        3
+      );
+
+      /* 수확 가능 반짝임 */
+      ctx.fillStyle = "#fff5bd";
+
+      ctx.fillRect(
+        x - 18,
+        y - 45,
+        3,
+        7
+      );
+
+      ctx.fillRect(
+        x - 20,
+        y - 43,
+        7,
+        3
+      );
+    }
+  }
+
+  function drawStations() {
+    stations.forEach(
+      (station, index) => {
+        const selected =
+          interactionTarget?.kind ===
+            "station" &&
+          interactionTarget.id ===
+            station.id;
+
+        if (selected) {
+          ctx.fillStyle =
+            "rgba(255,237,130,.46)";
+
+          ctx.fillRect(
+            station.x - 27,
+            station.y - 29,
+            54,
+            58
+          );
+        }
+
+        if (station.type === "bed") {
+          drawBedStation(station);
+          return;
+        }
+
+        if (station.type === "pond") {
+          drawPondStation(station);
+          return;
+        }
+
+        drawLabStation(
+          station,
+          index
+        );
+      }
+    );
+  }
+
+  function drawBedStation(station) {
+    ctx.fillStyle =
+      "rgba(53,35,24,.27)";
+
+    ctx.fillRect(
+      station.x - 31,
+      station.y + 17,
+      66,
+      9
+    );
+
+    ctx.fillStyle = "#553521";
+
+    ctx.fillRect(
+      station.x - 32,
+      station.y - 22,
+      64,
+      45
+    );
+
+    ctx.fillStyle = "#d7b66f";
+
+    ctx.fillRect(
+      station.x - 26,
+      station.y - 16,
+      52,
+      33
+    );
+
+    ctx.fillStyle = "#f3e5b5";
+
+    ctx.fillRect(
+      station.x - 21,
+      station.y - 12,
+      17,
+      25
+    );
+
+    ctx.fillStyle = "#69916a";
+
+    ctx.fillRect(
+      station.x,
+      station.y - 12,
+      21,
+      25
+    );
+
+    ctx.fillStyle = "#9bb389";
+
+    ctx.fillRect(
+      station.x + 4,
+      station.y - 8,
+      13,
+      17
+    );
+  }
+
+  function drawPondStation(station) {
+    ctx.fillStyle = "#4b3322";
+
+    ctx.fillRect(
+      station.x - 27,
+      station.y - 8,
+      54,
+      19
+    );
+
+    ctx.fillStyle = "#98603a";
+
+    ctx.fillRect(
+      station.x - 22,
+      station.y - 4,
+      44,
+      20
+    );
+
+    ctx.fillStyle = "#b47b48";
+
+    ctx.fillRect(
+      station.x - 16,
+      station.y,
+      32,
+      12
+    );
+
+    ctx.fillStyle = "#d4ae6c";
+
+    ctx.fillRect(
+      station.x - 12,
+      station.y + 2,
+      24,
+      3
+    );
+  }
+
+  function drawLabStation(
+    station,
+    index
+  ) {
+    /* 실험대 그림자 */
+    ctx.fillStyle =
+      "rgba(38,43,33,.28)";
+
+    ctx.fillRect(
+      station.x - 22,
+      station.y + 18,
+      48,
+      8
+    );
+
+    /* 실험대 몸체 */
+    ctx.fillStyle = "#394a47";
+
+    ctx.fillRect(
+      station.x - 22,
+      station.y - 19,
+      44,
+      39
+    );
+
+    ctx.fillStyle = "#799b8c";
+
+    ctx.fillRect(
+      station.x - 17,
+      station.y - 14,
+      34,
+      29
+    );
+
+    /* 화면 */
+    ctx.fillStyle = "#263b3d";
+
+    ctx.fillRect(
+      station.x - 13,
+      station.y - 11,
+      26,
+      16
+    );
+
+    ctx.fillStyle =
+      index % 2 === 0
+        ? "#9dd5af"
+        : "#83c4cc";
+
+    ctx.fillRect(
+      station.x - 9,
+      station.y - 8,
+      18,
+      10
+    );
+
+    /* 화면 픽셀 */
+    ctx.fillStyle = "#e1f5c5";
+
+    ctx.fillRect(
+      station.x - 7,
+      station.y - 6,
+      8,
+      2
+    );
+
+    ctx.fillRect(
+      station.x - 7,
+      station.y - 2,
+      12,
+      2
+    );
+
+    /* 버튼 */
+    ctx.fillStyle = "#d7a342";
+
+    ctx.fillRect(
+      station.x - 11,
+      station.y + 9,
+      5,
+      4
+    );
+
+    ctx.fillStyle = "#c85b4d";
+
+    ctx.fillRect(
+      station.x - 2,
+      station.y + 9,
+      5,
+      4
+    );
+
+    ctx.fillStyle = "#74b75c";
+
+    ctx.fillRect(
+      station.x + 7,
+      station.y + 9,
+      5,
+      4
+    );
+
+    /* 기계 다리 */
+    ctx.fillStyle = "#283733";
+
+    ctx.fillRect(
+      station.x - 17,
+      station.y + 19,
+      7,
+      8
+    );
+
+    ctx.fillRect(
+      station.x + 10,
+      station.y + 19,
+      7,
+      8
+    );
+  }
+
+  function drawNpcs() {
+    DATA.npcs.forEach(
+      (npc, index) => {
+        drawCharacter(
+          npc.x,
+          npc.y,
+          npc.color,
+          npc.name,
+          false,
+          index
+        );
+      }
+    );
+  }
+
+  function drawPlayer() {
+    const role =
+      DATA.roles[state.player.role];
+
+    drawCharacter(
+      state.player.x,
+      state.player.y,
+      role.color,
+      state.player.name,
+      true,
+      0
+    );
+
+    /* 플레이어가 바라보는 방향 */
+    const direction =
+      state.player.dir;
+
+    ctx.fillStyle = "#fff0a4";
+
+    if (direction === "up") {
+      ctx.fillRect(
+        state.player.x - 2,
+        state.player.y - 36,
+        5,
+        5
+      );
+    }
+
+    if (direction === "down") {
+      ctx.fillRect(
+        state.player.x - 2,
+        state.player.y + 26,
+        5,
+        5
+      );
+    }
+
+    if (direction === "left") {
+      ctx.fillRect(
+        state.player.x - 27,
+        state.player.y - 2,
+        5,
+        5
+      );
+    }
+
+    if (direction === "right") {
+      ctx.fillRect(
+        state.player.x + 22,
+        state.player.y - 2,
+        5,
+        5
+      );
+    }
+  }
+
+  function drawCharacter(
+    x,
+    y,
+    color,
+    name,
+    player,
+    variant = 0
+  ) {
+    const walking =
+      Math.floor(
+        performance.now() / 180
+      ) % 2;
+
+    const moving =
+      player &&
+      (
+        keys.arrowup ||
+        keys.arrowdown ||
+        keys.arrowleft ||
+        keys.arrowright ||
+        keys.w ||
+        keys.a ||
+        keys.s ||
+        keys.d
+      );
+
+    const step =
+      moving ? walking * 2 : 0;
+
+    /* 그림자 */
+    ctx.fillStyle =
+      "rgba(42,35,25,.28)";
+
+    ctx.fillRect(
+      x - 15,
+      y + 20,
+      30,
+      7
+    );
+
+    ctx.fillRect(
+      x - 10,
+      y + 25,
+      20,
+      3
+    );
+
+    /* 다리 */
+    ctx.fillStyle = "#3c3530";
+
+    ctx.fillRect(
+      x - 10,
+      y + 12 + step,
+      8,
+      14 - step
+    );
+
+    ctx.fillRect(
+      x + 3,
+      y + 14 - step,
+      8,
+      12 + step
+    );
+
+    /* 신발 */
+    ctx.fillStyle = "#39271d";
+
+    ctx.fillRect(
+      x - 12,
+      y + 23,
+      10,
+      5
+    );
+
+    ctx.fillRect(
+      x + 3,
+      y + 23,
+      11,
+      5
+    );
+
+    /* 몸통 외곽 */
+    ctx.fillStyle = "#35302b";
+
+    ctx.fillRect(
+      x - 14,
+      y - 5,
+      28,
+      23
+    );
+
+    /* 연구복 */
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+      x - 11,
+      y - 3,
+      22,
+      19
+    );
+
+    ctx.fillStyle = "#f3ead3";
+
+    ctx.fillRect(
+      x - 7,
+      y - 1,
+      14,
+      16
+    );
+
+    /* 연구복 중심선 */
+    ctx.fillStyle = "#b8b09f";
+
+    ctx.fillRect(
+      x - 1,
+      y,
+      2,
+      15
+    );
+
+    /* 주머니 */
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+      x + 3,
+      y + 7,
+      5,
+      5
+    );
+
+    /* 팔 */
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+      x - 16,
+      y,
+      5,
+      15
+    );
+
+    ctx.fillRect(
+      x + 11,
+      y,
+      5,
+      15
+    );
+
+    /* 목 */
+    ctx.fillStyle = "#d99a69";
+
+    ctx.fillRect(
+      x - 5,
+      y - 10,
+      10,
+      8
+    );
+
+    /* 얼굴 외곽 */
+    ctx.fillStyle = "#513426";
+
+    ctx.fillRect(
+      x - 12,
+      y - 27,
+      24,
+      19
+    );
+
+    /* 얼굴 */
+    ctx.fillStyle =
+      variant % 3 === 0
+        ? "#e5a873"
+        : variant % 3 === 1
+          ? "#d79365"
+          : "#efb986";
+
+    ctx.fillRect(
+      x - 9,
+      y - 24,
+      18,
+      16
+    );
+
+    /* 머리카락 */
+    ctx.fillStyle =
+      player
+        ? "#3a2c25"
+        : variant % 2 === 0
+          ? "#493226"
+          : "#5d4532";
+
+    ctx.fillRect(
+      x - 12,
+      y - 31,
+      24,
+      9
+    );
+
+    ctx.fillRect(
+      x - 12,
+      y - 25,
+      5,
+      9
+    );
+
+    ctx.fillRect(
+      x + 8,
+      y - 25,
+      4,
+      8
+    );
+
+    /* 머리 하이라이트 */
+    ctx.fillStyle =
+      player
+        ? "#65473a"
+        : "#786047";
+
+    ctx.fillRect(
+      x - 7,
+      y - 29,
+      10,
+      3
+    );
+
+    /* 눈 */
+    ctx.fillStyle = "#332821";
+
+    ctx.fillRect(
+      x - 6,
+      y - 19,
+      3,
+      3
+    );
+
+    ctx.fillRect(
+      x + 4,
+      y - 19,
+      3,
+      3
+    );
+
+    /* 코와 볼 */
+    ctx.fillStyle = "#c77e5f";
+
+    ctx.fillRect(
+      x - 1,
+      y - 15,
+      3,
+      2
+    );
+
+    ctx.fillStyle = "#e68f78";
+
+    ctx.fillRect(
+      x - 8,
+      y - 14,
+      3,
+      2
+    );
+
+    ctx.fillRect(
+      x + 6,
+      y - 14,
+      3,
+      2
+    );
+
+    /* 플레이어 배지 */
+    if (player) {
+      ctx.fillStyle = "#efd153";
+
+      ctx.fillRect(
+        x - 9,
+        y + 2,
+        4,
+        4
+      );
+    }
+
+    drawLabel(
+      name,
+      x - name.length * 5,
+      y - 37,
+      "#fff2bb"
+    );
+  }
+
+  function drawLabel(
+    text,
+    x,
+    y,
+    color
+  ) {
+    ctx.font =
+      "bold 12px monospace";
+
+    const width =
+      Math.ceil(
+        ctx.measureText(text).width
+      );
+
+    ctx.fillStyle =
+      "rgba(52,39,25,.82)";
+
+    ctx.fillRect(
+      x - 5,
+      y - 13,
+      width + 10,
+      18
+    );
+
+    ctx.fillStyle = "#bb8547";
+
+    ctx.fillRect(
+      x - 3,
+      y - 11,
+      width + 6,
+      2
+    );
+
+    ctx.fillStyle = color;
+
+    ctx.fillText(
+      text,
+      x,
+      y + 1
+    );
+  }
+
+  function drawRain() {
+    ctx.strokeStyle =
+      "rgba(191,226,231,.72)";
+
+    ctx.lineWidth = 2;
+
+    const time =
+      performance.now() / 8;
+
+    for (let i = 0; i < 62; i++) {
+      const x =
+        (i * 67 + time) %
+          (canvas.width + 40) -
+        20;
+
+      const y =
+        (i * 43 + time * 1.8) %
+          (canvas.height + 40) -
+        20;
+
+      ctx.beginPath();
+
+      ctx.moveTo(x, y);
+
+      ctx.lineTo(
+        x - 8,
+        y + 15
+      );
+
+      ctx.stroke();
+    }
+  }
 })();
