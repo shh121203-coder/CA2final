@@ -1010,3 +1010,486 @@ button {
     scroll-behavior: auto !important;
   }
 }
+/* ==================================================
+   BIO LAB — WARM PIXEL ART VISUAL UPDATE
+   기존 게임 구조를 유지하는 시각 개선 패치
+================================================== */
+
+:root {
+  --ink: #342719;
+  --paper: #f5dfaa;
+  --paper-light: #fff2c8;
+  --paper-dark: #c99a57;
+  --green: #39734b;
+  --green-light: #81bb4d;
+  --green-bright: #a7d85c;
+  --blue: #3e8291;
+  --gold: #e0a43e;
+  --red: #bd5545;
+  --wood: #8b552f;
+  --wood-dark: #553522;
+  --shadow: #231a13;
+}
+
+html,
+body {
+  background: #213c32;
+}
+
+body {
+  background-image:
+    linear-gradient(
+      rgba(255, 244, 194, 0.025) 2px,
+      transparent 2px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 244, 194, 0.025) 2px,
+      transparent 2px
+    );
+  background-size: 8px 8px;
+}
+
+/* 픽셀이 흐려지지 않도록 설정 */
+canvas,
+img,
+.role-sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* 시작 화면 */
+#start-screen {
+  background:
+    linear-gradient(
+      rgba(37, 73, 48, 0.12),
+      rgba(29, 49, 35, 0.68)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      #6faa4e 0 16px,
+      #76b454 16px 32px
+    );
+}
+
+.start-card {
+  background: #f4d99c;
+  border: 6px solid #4f321f;
+  box-shadow:
+    0 6px 0 #241a12,
+    inset 0 0 0 4px #ffefbd,
+    inset 0 0 0 8px #bb8243;
+}
+
+.start-card h1 {
+  color: #315f43;
+  text-shadow:
+    4px 0 #d1e873,
+    0 4px #d1e873,
+    4px 4px #6e813c,
+    7px 7px #4c321e;
+}
+
+.start-copy {
+  color: #6d4427;
+}
+
+/* 공통 패널 */
+.pixel-panel {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #f4dfa9 0 4px,
+      #f1d89c 4px 8px
+    );
+  border: 5px solid #4f3522;
+  border-radius: 0;
+  box-shadow:
+    0 5px 0 #241b14,
+    inset 0 0 0 3px #fff1c4,
+    inset 0 0 0 6px #b77d40;
+}
+
+/* 캐릭터 선택 */
+.role-card {
+  background: #e5bd73;
+  border: 4px solid #513722;
+  box-shadow:
+    4px 4px 0 #382519,
+    inset 0 0 0 2px #f8dfa3;
+}
+
+.role-card:hover {
+  background: #efca7d;
+}
+
+.role-card.selected {
+  background: #9dcc61;
+  box-shadow:
+    2px 2px 0 #382519,
+    inset 0 0 0 2px #dff2a1;
+}
+
+.role-sprite {
+  width: 48px;
+  height: 56px;
+  border: 4px solid #39281d;
+  background:
+    linear-gradient(
+      to bottom,
+      #49372a 0 10px,
+      #efb67d 10px 28px,
+      #f2ead2 28px 39px,
+      #4e7c5a 39px 56px
+    );
+  box-shadow:
+    4px 0 0 #2b2018,
+    inset 6px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+.role-sprite.molecular {
+  background:
+    linear-gradient(
+      to bottom,
+      #5a3b2b 0 10px,
+      #efb67d 10px 28px,
+      #f2ead2 28px 39px,
+      #4d7fb2 39px 56px
+    );
+}
+
+.role-sprite.engineer {
+  background:
+    linear-gradient(
+      to bottom,
+      #49372a 0 10px,
+      #efb67d 10px 28px,
+      #f2ead2 28px 39px,
+      #c97735 39px 56px
+    );
+}
+
+/* 입력창 */
+#player-name {
+  background: #fff1c6;
+  border: 4px solid #533824;
+  box-shadow:
+    inset 3px 3px 0 #d6ae69,
+    3px 3px 0 #352419;
+}
+
+#player-name:focus {
+  box-shadow:
+    inset 3px 3px 0 #d6ae69,
+    0 0 0 4px #85bd51;
+}
+
+/* 버튼 */
+.pixel-button {
+  color: #3b291d;
+  background: #e3ad55;
+  border: 4px solid #4d3320;
+  border-radius: 0;
+  box-shadow:
+    4px 4px 0 #2f2117,
+    inset 0 0 0 2px #f8d58e;
+  text-shadow: 1px 1px #ffe8b0;
+}
+
+.pixel-button:hover,
+.pixel-button:focus-visible {
+  background: #efbe68;
+  filter: none;
+}
+
+.pixel-button.primary {
+  background: #79b64b;
+  box-shadow:
+    4px 4px 0 #2f2117,
+    inset 0 0 0 2px #bce477;
+}
+
+.pixel-button.primary:hover {
+  background: #8ac857;
+}
+
+.pixel-button.danger {
+  background: #cf6654;
+}
+
+/* 상단 HUD */
+#hud {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #efd393 0 4px,
+      #e7c680 4px 8px
+    );
+}
+
+.hud-group {
+  border-right: 3px solid #936839;
+}
+
+.hud-group.brand strong {
+  color: #356746;
+  text-shadow: 2px 2px #c2dc6a;
+}
+
+.time-track,
+.stamina-track {
+  height: 16px;
+  background: #4a3527;
+  border: 3px solid #332319;
+  padding: 2px;
+  box-shadow: inset 2px 2px 0 #1e1813;
+}
+
+.time-track i {
+  background: #e6a843;
+}
+
+.stamina-track i {
+  background: #76bd50;
+}
+
+/* 게임 화면 테두리 */
+#canvas-wrap {
+  background: #17281f;
+  border: 6px solid #3d2a1e;
+  box-shadow:
+    6px 6px 0 #17120e,
+    inset 0 0 0 3px #b77d42;
+}
+
+#game-canvas {
+  background: #78ad4e;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* 퀘스트 표시 */
+.side-panel h2 {
+  color: #4e3321;
+  border-bottom: 4px double #9b6936;
+}
+
+.quest-name {
+  color: #315f3f;
+  text-shadow: 1px 1px #dce993;
+}
+
+.quest-area {
+  color: #966128;
+  font-weight: 800;
+}
+
+.progress-track {
+  height: 17px;
+  padding: 2px;
+  background: #463226;
+  border: 3px solid #342318;
+  box-shadow: inset 2px 2px 0 #201710;
+}
+
+.progress-track i {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #65a943 0 8px,
+      #7fc354 8px 16px
+    );
+}
+
+.reward-line {
+  color: #80501e;
+  font-weight: 800;
+}
+
+/* 가방·인물·장비 탭 */
+.tab-buttons {
+  gap: 5px;
+}
+
+.tab {
+  background: #c9964e;
+  border: 3px solid #4e3421;
+  box-shadow: inset 0 0 0 2px #e7bd76;
+}
+
+.tab.active {
+  background: #79b64d;
+  box-shadow: inset 0 0 0 2px #bce17b;
+}
+
+.side-row {
+  padding: 9px 3px;
+  border-bottom: 2px dashed #a1703c;
+}
+
+.side-row:hover {
+  background: rgba(255, 246, 198, 0.35);
+}
+
+.heart {
+  color: #c74e52;
+  text-shadow: 1px 1px #71332f;
+}
+
+/* 상호작용 안내 */
+.interaction-hint,
+.zone-banner,
+.toast {
+  color: #fff5c5;
+  background: #314a35;
+  border: 4px solid #e7c272;
+  box-shadow:
+    4px 4px 0 #1d1812,
+    inset 0 0 0 2px #648650;
+}
+
+.interaction-hint {
+  padding: 9px 15px;
+}
+
+.zone-banner {
+  background: #704625;
+}
+
+/* 대화창 */
+.modal {
+  background: rgba(22, 29, 23, 0.76);
+}
+
+.modal-card {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #f5dfa7 0 4px,
+      #f1d599 4px 8px
+    );
+}
+
+.modal-head {
+  border-bottom: 4px double #996a39;
+}
+
+.dialogue-name {
+  color: #397047;
+  font-size: 1.05rem;
+}
+
+.dialogue-text {
+  color: #3e2d22;
+}
+
+#modal-close {
+  background: #ce604e;
+  border: 3px solid #4b3020;
+  box-shadow: 3px 3px 0 #2d1d14;
+}
+
+.choice-button {
+  background: #ffefbc;
+  border: 4px solid #513622;
+  box-shadow:
+    3px 3px 0 #382519,
+    inset 0 0 0 2px #fff8d8;
+}
+
+.choice-button:hover {
+  background: #cbe087;
+}
+
+.feedback {
+  border: 4px solid #513622;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.35);
+}
+
+.feedback.correct {
+  background: #a9d26d;
+}
+
+.feedback.wrong {
+  background: #df8b73;
+}
+
+/* 상점과 작물 카드 */
+.shop-card,
+.crop-card {
+  background: #ffedb9;
+  border: 4px solid #533824;
+  box-shadow:
+    3px 3px 0 #382419,
+    inset 0 0 0 2px #fff8d9;
+}
+
+.shop-card:hover,
+.crop-card:hover {
+  background: #f6dda0;
+}
+
+/* 실험 UI */
+.range-wrap {
+  background: #d9ad68;
+  border: 4px solid #503522;
+}
+
+.sequence-buttons button {
+  background: #a8cd73;
+  border: 4px solid #4b3422;
+  box-shadow: 3px 3px 0 #302117;
+}
+
+.sequence-result {
+  background: #fff0bd;
+  border: 3px dashed #926537;
+}
+
+.dish {
+  background:
+    radial-gradient(
+      circle,
+      #e9eccd 0 52%,
+      #8fa183 53% 64%,
+      #53624f 65% 100%
+    );
+  border: 4px solid #3f4b3d;
+  border-radius: 50%;
+}
+
+/* 모바일 조작 버튼 */
+.dpad button,
+.action-button {
+  color: #fff4c4;
+  background: rgba(74, 69, 39, 0.94);
+  border: 4px solid #efd17e;
+  box-shadow:
+    4px 4px 0 rgba(28, 20, 13, 0.85),
+    inset 0 0 0 2px #73894a;
+}
+
+.action-button {
+  background: rgba(65, 111, 62, 0.95);
+}
+
+/* 작은 화면에서 게임 영역을 더 크게 */
+@media (max-width: 760px) {
+  #canvas-wrap {
+    border-width: 4px;
+  }
+
+  #game-canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .interaction-hint {
+    bottom: 105px;
+    white-space: nowrap;
+  }
+
+  .zone-banner {
+    top: 12px;
+  }
+}
