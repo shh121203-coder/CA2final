@@ -10,8 +10,8 @@
   ctx.imageSmoothingEnabled = false;
 
   const WORLD = {
-    width: 1792,
-    height: 1152
+    width: 3200,
+    height: 2200
   };
 
   const keys = Object.create(null);
