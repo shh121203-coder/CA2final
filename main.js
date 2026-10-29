@@ -130,77 +130,150 @@
   }
 ];
 
-  const baseSamples = [
-    {
-      key: "s1",
-      sample: "moss",
-      x: 120,
-      y: 245
-    },
-    {
-      key: "s2",
-      sample: "soil",
-      x: 235,
-      y: 565
-    },
-    {
-      key: "s3",
-      sample: "pollen",
-      x: 155,
-      y: 875
-    },
-    {
-      key: "s4",
-      sample: "moss",
-      x: 520,
-      y: 170
-    },
-    {
-      key: "s5",
-      sample: "soil",
-      x: 610,
-      y: 1040
-    },
-    {
-      key: "s6",
-      sample: "pollen",
-      x: 1640,
-      y: 980
-    },
-    {
-      key: "s7",
-      sample: "moss",
-      x: 1720,
-      y: 150
-    },
-    {
-      key: "s8",
-      sample: "soil",
-      x: 1180,
-      y: 910
-    }
-  ];
+const baseSamples = [
+  {
+    key: "s1",
+    sample: "moss",
+    x: 150,
+    y: 260
+  },
+  {
+    key: "s2",
+    sample: "soil",
+    x: 300,
+    y: 510
+  },
+  {
+    key: "s3",
+    sample: "pollen",
+    x: 170,
+    y: 790
+  },
+  {
+    key: "s4",
+    sample: "moss",
+    x: 650,
+    y: 180
+  },
+  {
+    key: "s5",
+    sample: "soil",
+    x: 810,
+    y: 720
+  },
+  {
+    key: "s6",
+    sample: "pollen",
+    x: 930,
+    y: 360
+  },
+  {
+    key: "s7",
+    sample: "moss",
+    x: 160,
+    y: 1810
+  },
+  {
+    key: "s8",
+    sample: "soil",
+    x: 520,
+    y: 1930
+  },
+  {
+    key: "s9",
+    sample: "pollen",
+    x: 860,
+    y: 1790
+  },
+  {
+    key: "s10",
+    sample: "moss",
+    x: 2120,
+    y: 270
+  },
+  {
+    key: "s11",
+    sample: "soil",
+    x: 2980,
+    y: 570
+  },
+  {
+    key: "s12",
+    sample: "pollen",
+    x: 2800,
+    y: 1210
+  },
+  {
+    key: "s13",
+    sample: "soil",
+    x: 2100,
+    y: 1870
+  },
+  {
+    key: "s14",
+    sample: "moss",
+    x: 3000,
+    y: 1910
+  },
+  {
+    key: "s15",
+    sample: "pollen",
+    x: 1850,
+    y: 620
+  },
+  {
+    key: "s16",
+    sample: "soil",
+    x: 1240,
+    y: 1540
+  }
+];
 
   const treePositions = [];
 
-  for (let i = 0; i < 36; i++) {
-    treePositions.push({
-      x: 50 + ((i * 137) % 570),
-      y: 80 + ((i * 211) % 980)
-    });
+/* 북서쪽 생태숲과 북동쪽 온실 외곽 */
+for (let i = 0; i < 64; i++) {
+  const forestSide = i % 2 === 0;
+
+  const tree = {
+    x: forestSide
+      ? 65 + ((i * 137) % 870)
+      : 2110 + ((i * 149) % 1000),
+
+    y: forestSide
+      ? 70 + ((i * 211) % 770)
+      : 35 + ((i * 173) % 90)
+  };
+
+  /* 연못 안에는 나무를 배치하지 않음 */
+  const nearPond =
+    ((tree.x - 500) ** 2) / (350 ** 2) +
+    ((tree.y - 520) ** 2) / (255 ** 2) < 1;
+
+  if (!nearPond) {
+    treePositions.push(tree);
   }
+}
+
+/* 남서쪽 종자 보존림 */
+for (let i = 0; i < 26; i++) {
+  treePositions.push({
+    x: 70 + ((i * 173) % 880),
+    y: 1680 + ((i * 97) % 430)
+  });
+}
 
   function newState(name, role) {
     return {
       version: 2,
 
       player: {
-        name,
-        role,
-        x: 890,
-        y: 690,
-        dir: "down"
-      },
+  name,
+  role,
+  x: 1580,
+  y: 1160,
+  dir: "down"
+},    
 
       day: 1,
       minutes: 8 * 60,
@@ -766,28 +839,52 @@
   }
 
   function zoneAt(x, y) {
-    if (x < 650 && y < 600) {
-      return "생태 보존구역";
+  if (x < 1040) {
+    if (y < 930) {
+      return "반딧불 생태숲";
     }
 
-    if (x < 720 && y >= 600) {
-      return "분자 연구구역";
+    if (y < 1650) {
+      return "분자생물학 연구단지";
     }
 
-    if (x > 1200 && y < 590) {
-      return "스마트 온실";
+    return "종자 보존림";
+  }
+
+  if (x > 2050) {
+    if (y < 790) {
+      return "유리돔 스마트 온실";
     }
 
-    if (x > 1200 && y >= 590) {
-      return "시험 재배지";
+    if (y < 1130) {
+      return "기후 관측 고원";
     }
 
-    if (y > 900) {
-      return "연구원 생활관";
+    if (y < 1810) {
+      return "대규모 시험 재배지";
     }
 
+    return "염생식물 습지";
+  }
+
+  if (y < 620) {
+    return "연구 보급거리";
+  }
+
+  if (y < 1030) {
     return "중앙 연구동";
   }
+
+  if (y < 1420) {
+    return "BIO LAB 중앙광장";
+  }
+
+  if (y < 1660) {
+    return "교육·교류 정원";
+  }
+
+  return "연구원 생활마을";
+}
 
   function announceZone(zone) {
     lastZone = zone;
@@ -3673,16 +3770,16 @@
     setDailyTask();
 
     closeModal();
-    saveGame(false);
+saveGame(false);
 
-    state.player.x = 1060;
-    state.player.y = 990;
+state.player.x = 1560;
+state.player.y = 1990;
 
-    updateAllUI();
+updateAllUI();
 
-    announceZone(
-      "연구원 생활관"
-    );
+announceZone(
+  "연구원 생활마을"
+);
 
     showToast(
       `${
@@ -4196,12 +4293,12 @@
     return Math.max(min, Math.min(max, value));
   }
 
-  function plotPosition(index) {
-    return {
-      x: 1280 + (index % 4) * 98,
-      y: 665 + Math.floor(index / 4) * 112
-    };
-  }
+function plotPosition(index) {
+  return {
+    x: 2240 + (index % 4) * 165,
+    y: 1250 + Math.floor(index / 4) * 150
+  };
+}
 
   function draw() {
     ctx.clearRect(
@@ -7120,3 +7217,529 @@
     }
   }
 })();
+/* =====================================================
+   BIO LAB 확장 지도 통합 패치
+   파일 마지막의 })(); 바로 위에 붙이기
+===================================================== */
+
+function bioRegions() {
+  return [
+    {
+      name: "반딧불 생태숲",
+      x: 0, y: 0, w: 1040, h: 930,
+      color: "#56844c"
+    },
+    {
+      name: "분자생물학 연구단지",
+      x: 0, y: 930, w: 1040, h: 720,
+      color: "#86a58a"
+    },
+    {
+      name: "종자 보존림",
+      x: 0, y: 1650, w: 1040, h: 550,
+      color: "#557344"
+    },
+    {
+      name: "연구 보급거리",
+      x: 1040, y: 0, w: 1010, h: 620,
+      color: "#b3a174"
+    },
+    {
+      name: "중앙 연구동",
+      x: 1040, y: 620, w: 1010, h: 410,
+      color: "#83ac60"
+    },
+    {
+      name: "BIO LAB 중앙광장",
+      x: 1040, y: 1030, w: 1010, h: 390,
+      color: "#a8b17b"
+    },
+    {
+      name: "교육·교류 정원",
+      x: 1040, y: 1420, w: 1010, h: 240,
+      color: "#8db16b"
+    },
+    {
+      name: "연구원 생활마을",
+      x: 1040, y: 1660, w: 1010, h: 540,
+      color: "#91a66c"
+    },
+    {
+      name: "유리돔 스마트 온실",
+      x: 2050, y: 0, w: 1150, h: 790,
+      color: "#78a967"
+    },
+    {
+      name: "기후 관측 고원",
+      x: 2050, y: 790, w: 1150, h: 340,
+      color: "#8b9b6b"
+    },
+    {
+      name: "대규모 시험 재배지",
+      x: 2050, y: 1130, w: 1150, h: 680,
+      color: "#a18a55"
+    },
+    {
+      name: "염생식물 습지",
+      x: 2050, y: 1810, w: 1150, h: 390,
+      color: "#799a80"
+    }
+  ];
+}
+
+function bioBuildings() {
+  return [
+    {
+      x: 1240, y: 660, w: 590, h: 315,
+      name: "중앙 연구동", roof: "#a95843"
+    },
+    {
+      x: 1190, y: 150, w: 330, h: 240,
+      name: "종자 상점", roof: "#ad6346"
+    },
+    {
+      x: 1600, y: 190, w: 300, h: 230,
+      name: "연구 보급소", roof: "#6b887c"
+    },
+    {
+      x: 130, y: 1040, w: 430, h: 230,
+      name: "분자 연구실", roof: "#648397"
+    },
+    {
+      x: 610, y: 1040, w: 310, h: 180,
+      name: "관찰 연구실", roof: "#738b98"
+    },
+    {
+      x: 340, y: 1740, w: 370, h: 270,
+      name: "종자 보존고", roof: "#747450"
+    },
+    {
+      x: 1180, y: 1760, w: 330, h: 220,
+      name: "연구원 숙소", roof: "#b06c4b"
+    },
+    {
+      x: 1640, y: 1760, w: 280, h: 220,
+      name: "작은 도서관", roof: "#957250"
+    },
+    {
+      x: 2190, y: 150, w: 470, h: 360,
+      name: "스마트 온실", roof: "#76aaa0"
+    },
+    {
+      x: 2740, y: 190, w: 350, h: 300,
+      name: "배양 연구동", roof: "#6c9a94"
+    },
+    {
+      x: 2700, y: 690, w: 350, h: 150,
+      name: "기후 관측소", roof: "#8b7e68"
+    }
+  ];
+}
+
+/* 새 지도에 맞는 지역 이름 */
+function zoneAt(x, y) {
+  const region = bioRegions().find(item =>
+    x >= item.x &&
+    x < item.x + item.w &&
+    y >= item.y &&
+    y < item.y + item.h
+  );
+
+  return region ? region.name : "BIO LAB 연구지구";
+}
+
+/* 작물 재배 위치 */
+function plotPosition(index) {
+  return {
+    x: 2240 + (index % 4) * 165,
+    y: 1250 + Math.floor(index / 4) * 150
+  };
+}
+
+/* 건물·연못·나무 충돌 */
+function blocked(x, y) {
+  const insidePond =
+    ((x - 500) ** 2) / (260 ** 2) +
+    ((y - 520) ** 2) / (170 ** 2) < 0.85;
+
+  if (insidePond) return true;
+
+  const insideBuilding = bioBuildings().some(item =>
+    x > item.x - 10 &&
+    x < item.x + item.w + 10 &&
+    y > item.y - 8 &&
+    y < item.y + item.h + 10
+  );
+
+  if (insideBuilding) return true;
+
+  return treePositions.some(tree =>
+    Math.abs(x - tree.x) < 18 &&
+    Math.abs(y - tree.y) < 14
+  );
+}
+
+/* 화면 밖 물체는 그리지 않기 */
+function bioVisible(x, y, w, h) {
+  return (
+    x + w >= camera.x - 80 &&
+    y + h >= camera.y - 80 &&
+    x <= camera.x + canvas.width + 80 &&
+    y <= camera.y + canvas.height + 80
+  );
+}
+
+function bioRect(x, y, w, h, color) {
+  ctx.fillStyle = color;
+
+  ctx.fillRect(
+    Math.floor(x),
+    Math.floor(y),
+    Math.floor(w),
+    Math.floor(h)
+  );
+}
+
+/* 흙길 */
+function bioPath(x, y, w, h) {
+  bioRect(x - 5, y - 5, w + 10, h + 10, "#8c8150");
+  bioRect(x, y, w, h, "#c8ad74");
+
+  const left = Math.max(x, Math.floor(camera.x / 32) * 32);
+  const top = Math.max(y, Math.floor(camera.y / 32) * 32);
+  const right = Math.min(x + w, camera.x + canvas.width + 32);
+  const bottom = Math.min(y + h, camera.y + canvas.height + 32);
+
+  for (let yy = top; yy < bottom; yy += 32) {
+    for (let xx = left; xx < right; xx += 32) {
+      const pattern =
+        Math.floor(xx / 32) + Math.floor(yy / 32);
+
+      if (pattern % 3 === 0) {
+        bioRect(xx + 7, yy + 9, 5, 3, "#ac915f");
+        bioRect(xx + 17, yy + 22, 3, 2, "#dfc58c");
+      }
+    }
+  }
+}
+
+/* 지역별 바닥·길·연못 */
+function bioDrawGround() {
+  bioRegions().forEach(region => {
+    if (!bioVisible(region.x, region.y, region.w, region.h)) {
+      return;
+    }
+
+    bioRect(
+      region.x,
+      region.y,
+      region.w,
+      region.h,
+      region.color
+    );
+  });
+
+  const startX = Math.max(0, Math.floor(camera.x / 24) * 24);
+  const startY = Math.max(0, Math.floor(camera.y / 24) * 24);
+  const endX = Math.min(WORLD.width, camera.x + canvas.width + 24);
+  const endY = Math.min(WORLD.height, camera.y + canvas.height + 24);
+
+  for (let y = startY; y < endY; y += 24) {
+    for (let x = startX; x < endX; x += 24) {
+      const pattern = (
+        Math.floor(x / 24) * 13 +
+        Math.floor(y / 24) * 19
+      ) % 23;
+
+      if (pattern < 5) {
+        bioRect(x + 4, y + 7, 3, 6, "rgba(37,75,34,.25)");
+        bioRect(x + 9, y + 10, 3, 3, "rgba(225,238,166,.3)");
+      }
+
+      if (pattern === 12) {
+        bioRect(x + 14, y + 12, 3, 3, "#ead798");
+        bioRect(x + 15, y + 15, 2, 4, "#507744");
+      }
+    }
+  }
+
+  /* 지역을 연결하는 큰길 */
+  bioPath(990, 0, 100, WORLD.height);
+  bioPath(1995, 0, 110, WORLD.height);
+  bioPath(0, 880, WORLD.width, 92);
+  bioPath(0, 1600, WORLD.width, 92);
+  bioPath(1440, 420, 110, 1780);
+  bioPath(990, 1080, 1115, 92);
+
+  /* 중앙광장 */
+  if (bioVisible(1190, 990, 670, 500)) {
+    bioRect(1190, 990, 670, 500, "#947f5a");
+    bioRect(1200, 1000, 650, 480, "#c4b284");
+
+    for (let y = 1000; y < 1480; y += 32) {
+      for (let x = 1200; x < 1850; x += 32) {
+        bioRect(x + 2, y + 2, 28, 28, "#d2bf92");
+      }
+    }
+  }
+
+  /* 생태숲 연못 */
+  ctx.fillStyle = "#456f6b";
+  ctx.beginPath();
+  ctx.ellipse(500, 520, 280, 190, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#539b9b";
+  ctx.beginPath();
+  ctx.ellipse(500, 514, 258, 170, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const wave = Math.floor(performance.now() / 350) % 3;
+
+  for (let i = 0; i < 12; i++) {
+    const x = 310 + ((i * 73) % 360);
+    const y = 420 + ((i * 47) % 180);
+
+    bioRect(x + wave * 3, y, 20, 3, "#8bbfba");
+  }
+
+  /* 습지 물웅덩이 */
+  for (let i = 0; i < 7; i++) {
+    bioRect(
+      2130 + i * 135,
+      1900 + (i % 2) * 55,
+      100,
+      34,
+      "#65918f"
+    );
+  }
+}
+
+/* 건물은 내부 대신 지붕과 외벽 표시 */
+function bioDrawBuilding(building) {
+  const { x, y, w, h, roof, name } = building;
+
+  if (!bioVisible(x - 20, y - 30, w + 40, h + 70)) {
+    return;
+  }
+
+  const roofHeight = Math.min(100, Math.floor(h * 0.45));
+  const doorX = Math.floor(x + w / 2 - 18);
+  const doorY = y + h - 55;
+
+  bioRect(x + 12, y + 18, w, h + 12, "rgba(37,40,26,.28)");
+  bioRect(x, y + roofHeight, w, h - roofHeight, "#59432c");
+
+  bioRect(
+    x + 7,
+    y + roofHeight,
+    w - 14,
+    h - roofHeight - 7,
+    "#d2ae71"
+  );
+
+  /* 목재 외벽 결 */
+  for (let yy = y + roofHeight + 12; yy < y + h - 5; yy += 14) {
+    bioRect(x + 8, yy, w - 16, 2, "#ba955d");
+  }
+
+  /* 기와지붕 */
+  bioRect(x - 12, y, w + 24, roofHeight, "#4b3b2b");
+  bioRect(x - 7, y + 6, w + 14, roofHeight - 12, roof);
+
+  for (let yy = y + 14; yy < y + roofHeight - 5; yy += 16) {
+    bioRect(x - 5, yy, w + 10, 3, "rgba(54,38,29,.3)");
+
+    for (let xx = x + 8; xx < x + w; xx += 28) {
+      bioRect(xx, yy - 9, 2, 9, "rgba(255,230,182,.22)");
+    }
+  }
+
+  /* 창문 */
+  [x + 30, x + w - 74].forEach(windowX => {
+    const windowY = y + roofHeight + 18;
+
+    bioRect(windowX, windowY, 44, 44, "#62472d");
+    bioRect(windowX + 5, windowY + 5, 34, 34, "#9fc9bc");
+    bioRect(windowX + 20, windowY + 5, 4, 34, "#eee0b4");
+    bioRect(windowX + 5, windowY + 20, 34, 4, "#eee0b4");
+    bioRect(windowX - 3, windowY + 43, 50, 5, "#735332");
+  });
+
+  /* 문과 계단 */
+  bioRect(doorX - 5, doorY - 5, 46, 60, "#60452b");
+  bioRect(doorX, doorY, 36, 55, "#94683e");
+  bioRect(doorX + 6, doorY + 6, 24, 25, "#b8c6a0");
+  bioRect(doorX + 27, doorY + 38, 4, 4, "#f1d47b");
+  bioRect(doorX - 12, y + h, 60, 8, "#b29a73");
+  bioRect(doorX - 18, y + h + 8, 72, 8, "#917f60");
+
+  /* 건물 간판 */
+  ctx.font = "bold 13px sans-serif";
+  const labelWidth = Math.ceil(ctx.measureText(name).width) + 24;
+
+  bioRect(
+    x + w / 2 - labelWidth / 2,
+    y - 25,
+    labelWidth,
+    25,
+    "#59452d"
+  );
+
+  bioRect(
+    x + w / 2 - labelWidth / 2 + 3,
+    y - 22,
+    labelWidth - 6,
+    19,
+    "#82633a"
+  );
+
+  ctx.fillStyle = "#fff0b9";
+  ctx.textAlign = "center";
+  ctx.fillText(name, x + w / 2, y - 8);
+  ctx.textAlign = "left";
+}
+
+/* 야외 실험 시설 */
+function bioDrawStations() {
+  stations.forEach(station => {
+    if (!bioVisible(station.x - 35, station.y - 60, 100, 110)) {
+      return;
+    }
+
+    const x = station.x;
+    const y = station.y;
+
+    bioRect(x - 25, y + 10, 56, 10, "rgba(31,43,30,.25)");
+    bioRect(x - 24, y - 18, 48, 32, "#5b4b34");
+    bioRect(x - 20, y - 22, 40, 28, "#d9d4b3");
+    bioRect(x - 14, y - 35, 28, 21, "#425b56");
+    bioRect(x - 9, y - 30, 18, 11, "#9bd3ba");
+    bioRect(x + 11, y - 8, 5, 5, "#e8bc62");
+
+    ctx.font = "bold 11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#332b20";
+    ctx.fillText(station.name, x, y - 45);
+    ctx.textAlign = "left";
+  });
+}
+
+/* 전체 지도와 플레이어 위치 */
+function bioDrawMiniMap() {
+  const width = Math.min(166, canvas.width * 0.27);
+  const height = width * WORLD.height / WORLD.width;
+  const x = canvas.width - width - 15;
+  const y = 16;
+  const sx = width / WORLD.width;
+  const sy = height / WORLD.height;
+
+  ctx.save();
+
+  bioRect(x - 5, y - 5, width + 10, height + 10, "#463a29");
+
+  bioRegions().forEach(region => {
+    bioRect(
+      x + region.x * sx,
+      y + region.y * sy,
+      region.w * sx + 1,
+      region.h * sy + 1,
+      region.color
+    );
+  });
+
+  bioBuildings().forEach(building => {
+    bioRect(
+      x + building.x * sx,
+      y + building.y * sy,
+      Math.max(3, building.w * sx),
+      Math.max(3, building.h * sy),
+      "#654d39"
+    );
+  });
+
+  stations.forEach(station => {
+    bioRect(
+      x + station.x * sx - 1,
+      y + station.y * sy - 1,
+      3,
+      3,
+      "#ffe5a1"
+    );
+  });
+
+  ctx.strokeStyle = "#fff3ce";
+  ctx.lineWidth = 1;
+
+  ctx.strokeRect(
+    x + camera.x * sx,
+    y + camera.y * sy,
+    canvas.width * sx,
+    canvas.height * sy
+  );
+
+  bioRect(
+    x + state.player.x * sx - 2,
+    y + state.player.y * sy - 2,
+    5,
+    5,
+    "#e64f49"
+  );
+
+  ctx.restore();
+}
+
+/* 기존 화면 그리기를 확장 지도 버전으로 교체 */
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = false;
+
+  ctx.save();
+
+  ctx.translate(
+    -Math.floor(camera.x),
+    -Math.floor(camera.y)
+  );
+
+  bioDrawGround();
+  bioBuildings().forEach(bioDrawBuilding);
+
+  drawTrees();
+  drawSamples();
+  drawPlots();
+  bioDrawStations();
+  drawNpcs();
+  drawPlayer();
+
+  ctx.restore();
+
+  drawLightOverlay();
+
+  if (state.weather === "rain") {
+    drawRain();
+  }
+
+  bioDrawMiniMap();
+}
+
+/* 기존 시설 기능은 보존하고 새 실험 시설만 연결 */
+const bioPreviousUseStation = useStation;
+
+useStation = function(station) {
+  const extraExperiments = [
+    "gel",
+    "sequence",
+    "enzyme",
+    "contamination",
+    "cross",
+    "climate"
+  ];
+
+  if (extraExperiments.includes(station.type)) {
+    return openMinigame(station.type, false);
+  }
+
+  return bioPreviousUseStation(station);
+};
+
+/* BIO LAB 확장 지도 통합 패치 끝 */
