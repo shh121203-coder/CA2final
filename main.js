@@ -30,56 +30,105 @@
   let interactionTarget = null;
 
   const stations = [
-    {
-      id: "shop",
-      name: "연구 보급소",
-      x: 1030,
-      y: 250,
-      type: "shop"
-    },
-    {
-      id: "scope",
-      name: "현미경 관찰대",
-      x: 800,
-      y: 455,
-      type: "scope"
-    },
-    {
-      id: "terminal",
-      name: "연구 기록 단말기",
-      x: 925,
-      y: 510,
-      type: "terminal"
-    },
-    {
-      id: "pcr",
-      name: "PCR 장비",
-      x: 475,
-      y: 770,
-      type: "pcr"
-    },
-    {
-      id: "culture",
-      name: "조직 배양대",
-      x: 1465,
-      y: 425,
-      type: "culture"
-    },
-    {
-      id: "pond",
-      name: "물 표본 채취 지점",
-      x: 360,
-      y: 405,
-      type: "pond"
-    },
-    {
-      id: "bed",
-      name: "연구원 숙소",
-      x: 1080,
-      y: 1030,
-      type: "bed"
-    }
-  ];
+  {
+    id: "shop",
+    name: "연구 보급소",
+    x: 1510,
+    y: 420,
+    type: "shop"
+  },
+  {
+    id: "scope",
+    name: "현미경 관찰대",
+    x: 760,
+    y: 1270,
+    type: "scope"
+  },
+  {
+    id: "terminal",
+    name: "연구 기록 단말기",
+    x: 1570,
+    y: 1020,
+    type: "terminal"
+  },
+  {
+    id: "pcr",
+    name: "PCR 장비",
+    x: 430,
+    y: 1330,
+    type: "pcr"
+  },
+  {
+    id: "culture",
+    name: "조직 배양대",
+    x: 2490,
+    y: 570,
+    type: "culture"
+  },
+  {
+    id: "pond",
+    name: "물 표본 채취 지점",
+    x: 500,
+    y: 650,
+    type: "pond"
+  },
+  {
+    id: "bed",
+    name: "연구원 숙소",
+    x: 1560,
+    y: 1990,
+    type: "bed"
+  },
+  {
+    id: "gel",
+    name: "DNA 전기영동 분석기",
+    x: 610,
+    y: 1470,
+    type: "gel"
+  },
+  {
+    id: "sequence",
+    name: "염기서열 복원 단말기",
+    x: 810,
+    y: 1430,
+    type: "sequence"
+  },
+  {
+    id: "enzyme",
+    name: "효소 반응기",
+    x: 370,
+    y: 1510,
+    type: "enzyme"
+  },
+  {
+    id: "contamination",
+    name: "배양 오염 검사대",
+    x: 2660,
+    y: 590,
+    type: "contamination"
+  },
+  {
+    id: "cross",
+    name: "인공수분 교배대",
+    x: 2530,
+    y: 1450,
+    type: "cross"
+  },
+  {
+    id: "climate",
+    name: "기후 챔버",
+    x: 2870,
+    y: 890,
+    type: "climate"
+  },
+  {
+    id: "field-terminal",
+    name: "야외 생육 기록대",
+    x: 2250,
+    y: 1310,
+    type: "terminal"
+  }
+];
 
   const baseSamples = [
     {
