@@ -8801,4 +8801,1074 @@ function drawCharacter(
 }
 
 /* WARM PIXEL V6 끝 */
+/* =====================================================
+   BIO LAB · BLOOM V7
+   main.js 마지막 })(); 바로 위에 한 번만 삽입
+===================================================== */
+
+const BLOOM = (() => {
+  const cache = new Map();
+
+  const grass = [
+    "#67b62e",
+    "#72c533",
+    "#87d83b",
+    "#9ae345",
+    "#51a32b"
+  ];
+
+  const leaf = [
+    "#164d34",
+    "#196537",
+    "#23873c",
+    "#36a541",
+    "#66c747",
+    "#a1df56"
+  ];
+
+  function noise(x, y, seed = 0) {
+    let a =
+      Math.imul(x | 0, 374761393) ^
+      Math.imul(y | 0, 668265263) ^
+      seed;
+
+    a = Math.imul(a ^ (a >>> 13), 1274126177);
+
+    return ((a ^ (a >>> 16)) >>> 0) / 4294967296;
+  }
+
+  function box(g, x, y, w, h, color) {
+    g.fillStyle = color;
+
+    g.fillRect(
+      Math.round(x),
+      Math.round(y),
+      Math.round(w),
+      Math.round(h)
+    );
+  }
+
+  function polygon(g, points, color) {
+    g.fillStyle = color;
+    g.beginPath();
+
+    points.forEach((point, index) => {
+      if (index === 0) {
+        g.moveTo(...point);
+      } else {
+        g.lineTo(...point);
+      }
+    });
+
+    g.closePath();
+    g.fill();
+  }
+
+  /* 도트 이미지는 한 번 제작하고 재사용 */
+  function sprite(key, width, height, paint) {
+    if (!cache.has(key)) {
+      const image = document.createElement("canvas");
+
+      image.width = width;
+      image.height = height;
+
+      const g = image.getContext("2d");
+      g.imageSmoothingEnabled = false;
+
+      paint(g);
+      cache.set(key, image);
+    }
+
+    return cache.get(key);
+  }
+
+  function flower(g, x, y, color) {
+    box(g, x, y, 1, 5, "#287631");
+    box(g, x - 2, y - 3, 5, 2, color);
+    box(g, x, y - 5, 2, 6, color);
+    box(g, x, y - 2, 1, 1, "#ffe883");
+  }
+
+  function bush(g, x, y, seed = 0, flowers = false) {
+    for (let j = 0; j < 30; j++) {
+      const a = noise(seed, j, 4) * 20 - 10;
+      const b = noise(seed, j, 7) * 12 - 6;
+
+      if (a * a / 110 + b * b / 42 > 1) {
+        continue;
+      }
+
+      box(
+        g,
+        x + a,
+        y + b,
+        5,
+        4,
+        leaf[Math.floor(noise(seed, j, 9) * 5)]
+      );
+
+      box(
+        g,
+        x + a + 1,
+        y + b,
+        2,
+        1,
+        "#94d541"
+      );
+    }
+
+    if (flowers) {
+      for (let j = 0; j < 4; j++) {
+        flower(
+          g,
+          x - 7 + j * 4,
+          y - 1 - j % 2 * 4,
+          j % 2 ? "#ffb8c8" : "#ffe264"
+        );
+      }
+    }
+  }
+
+  /* 둥근 활엽수와 층이 나뉜 침엽수 */
+  function tree(kind) {
+    return sprite("tree-" + kind, 88, 120, g => {
+      box(g, 23, 107, 48, 7, "#245b3480");
+
+      polygon(
+        g,
+        [
+          [38, 70], [49, 70],
+          [50, 106], [60, 112],
+          [45, 109], [31, 114],
+          [37, 104]
+        ],
+        "#5c3c26"
+      );
+
+      box(g, 41, 73, 5, 34, "#b87935");
+      box(g, 43, 77, 2, 25, "#e2a24a");
+
+      const lobes = kind === 1
+        ? [
+            [44, 18, 11],
+            [44, 32, 18],
+            [44, 49, 25],
+            [44, 69, 33]
+          ]
+        : [
+            [43, 24, 19],
+            [27, 42, 22],
+            [58, 42, 23],
+            [40, 55, 29],
+            [23, 64, 17],
+            [61, 64, 18],
+            [43, 76, 23]
+          ];
+
+      lobes.forEach(([cx, cy, radius], index) => {
+        /* 수관의 짙은 외곽 */
+        for (
+          let yy = -radius;
+          yy <= radius;
+          yy += 2
+        ) {
+          const half = Math.floor(
+            Math.sqrt(
+              Math.max(0, radius * radius - yy * yy)
+            ) / 2
+          ) * 2;
+
+          box(
+            g,
+            cx - half,
+            cy + yy,
+            half * 2,
+            2,
+            leaf[0]
+          );
+        }
+
+        /* 잎 덩어리의 기본색 */
+        for (
+          let yy = -radius + 3;
+          yy < radius - 3;
+          yy += 2
+        ) {
+          const half = Math.floor(
+            Math.sqrt(
+              Math.max(
+                0,
+                (radius - 3) ** 2 - yy * yy
+              )
+            ) / 2
+          ) * 2;
+
+          box(
+            g,
+            cx - half - 1,
+            cy + yy - 2,
+            half * 2,
+            2,
+            leaf[2]
+          );
+        }
+
+        /* 왼쪽 위가 밝고 아래쪽이 어두운 잎 */
+        for (let j = 0; j < 55; j++) {
+          const xx = Math.floor(
+            noise(j * 7 + index, kind * 31 + index, 17) *
+            radius * 2
+          ) - radius;
+
+          const yy = Math.floor(
+            noise(j * 11 + index, kind * 29 + index, 71) *
+            radius * 2
+          ) - radius;
+
+          if (
+            xx * xx + yy * yy >
+            (radius - 4) ** 2
+          ) {
+            continue;
+          }
+
+          const lit = xx + yy < 0;
+
+          const color = lit
+            ? j % 4 ? leaf[4] : leaf[5]
+            : j % 3 ? leaf[3] : leaf[1];
+
+          box(
+            g,
+            cx + xx,
+            cy + yy - 2,
+            3 + j % 3,
+            2,
+            color
+          );
+        }
+      });
+    });
+  }
+
+  function windowSprite(g, x, y, w = 20, h = 24) {
+    box(g, x - 3, y - 3, w + 6, h + 7, "#643d24");
+    box(g, x - 1, y - 1, w + 2, h + 2, "#f6cf74");
+    box(g, x, y, w, h, "#4a9bb2");
+
+    polygon(
+      g,
+      [
+        [x + 1, y + 1],
+        [x + w - 2, y + 1],
+        [x + 1, y + h - 3]
+      ],
+      "#b9edf0"
+    );
+
+    box(g, x + w / 2 - 1, y, 2, h, "#fff1b5");
+    box(g, x, y + h / 2, w, 2, "#fff1b5");
+    box(g, x - 5, y + h + 2, w + 10, 3, "#a3642e");
+  }
+
+  /* 자체 제작 건물 스프라이트 */
+  function house(kind) {
+    return sprite("house-" + kind, 256, 224, g => {
+      const greenhouse = kind === 2;
+
+      const roofColor = kind === 1
+        ? "#427b92"
+        : "#bb4326";
+
+      box(g, 22, 193, 221, 18, "#343c3560");
+
+      /* 목재 외벽 */
+      box(g, 29, 100, 197, 90, "#68412b");
+
+      for (let y = 105; y < 188; y += 8) {
+        for (let x = 33; x < 223; x += 20) {
+          box(
+            g,
+            x,
+            y,
+            19,
+            7,
+            noise(x, y) > 0.5 ? "#dca84e" : "#efbc62"
+          );
+
+          box(g, x, y, 19, 1, "#ffe09a");
+          box(g, x, y + 6, 19, 1, "#aa7135");
+        }
+      }
+
+      /* 돌기단 */
+      box(g, 32, 179, 192, 16, "#665b44");
+
+      for (let y = 180; y < 194; y += 7) {
+        for (
+          let x = 33 + y % 2 * 7;
+          x < 221;
+          x += 18
+        ) {
+          box(g, x, y, 16, 5, "#96977a");
+          box(g, x, y, 15, 1, "#c3b994");
+        }
+      }
+
+      /* 비대칭 측면 증축부 */
+      box(g, 8, 115, 44, 70, "#96602d");
+
+      for (let y = 119; y < 180; y += 8) {
+        box(g, 10, y, 38, 2, "#d99a45");
+      }
+
+      polygon(
+        g,
+        [[4, 118], [20, 74], [64, 81], [52, 126]],
+        "#74371e"
+      );
+
+      /* 경사진 주 지붕 */
+      polygon(
+        g,
+        [
+          [18, 111], [54, 29], [183, 22],
+          [239, 105], [226, 116]
+        ],
+        "#592e22"
+      );
+
+      polygon(
+        g,
+        [[24, 105], [58, 33], [178, 28], [225, 103]],
+        roofColor
+      );
+
+      /* 기와 한 장씩 명암 */
+      for (let row = 0; row < 6; row++) {
+        const y = 34 + row * 12;
+        const left = 59 - row * 5;
+        const right = 180 + row * 7;
+
+        for (
+          let x = left + row % 2 * 10;
+          x < right;
+          x += 21
+        ) {
+          const tileColor = kind === 1
+            ? "#588fa3"
+            : noise(x, y) > 0.5
+              ? "#d35b30"
+              : "#bb4529";
+
+          box(g, x, y, 19, 10, tileColor);
+
+          box(
+            g, x, y, 18, 2,
+            kind === 1 ? "#9bc9cd" : "#f6934b"
+          );
+
+          box(
+            g, x + 18, y + 2, 2, 8,
+            kind === 1 ? "#34697e" : "#8b3423"
+          );
+        }
+      }
+
+      /* 정면 박공 */
+      polygon(
+        g,
+        [[79, 110], [126, 48], [175, 110]],
+        "#603a24"
+      );
+
+      polygon(
+        g,
+        [[85, 107], [126, 57], [168, 107]],
+        "#efc271"
+      );
+
+      for (let x = 92; x < 162; x += 8) {
+        box(g, x, 90, 2, 16, "#bf883b");
+      }
+
+      windowSprite(g, 117, 79, 18, 18);
+
+      box(g, 20, 108, 212, 6, "#653b22");
+      box(g, 22, 108, 208, 2, "#e4a44b");
+
+      if (greenhouse) {
+        for (let x = 39; x < 215; x += 34) {
+          windowSprite(g, x, 122, 27, 40);
+        }
+      } else {
+        windowSprite(g, 56, 126, 24, 28);
+        windowSprite(g, 176, 126, 24, 28);
+      }
+
+      /* 현관문 */
+      box(g, 109, 129, 36, 63, "#603923");
+      box(g, 113, 132, 28, 56, "#bf7335");
+
+      windowSprite(g, 119, 137, 16, 20);
+
+      box(g, 118, 168, 19, 15, "#d99346");
+      box(g, 134, 166, 3, 3, "#ffe59a");
+
+      /* 데크와 계단 */
+      box(g, 24, 190, 206, 13, "#79451f");
+
+      for (let y = 190; y < 203; y += 4) {
+        box(g, 26, y, 202, 2, "#ca8942");
+      }
+
+      box(g, 95, 202, 65, 5, "#b58243");
+      box(g, 88, 207, 79, 5, "#d5a357");
+
+      /* 현관 화분 */
+      [26, 225].forEach(x => {
+        box(g, x, 174, 15, 16, "#a45229");
+        box(g, x - 2, 172, 19, 4, "#f1a251");
+        bush(g, x + 7, 167, x, true);
+      });
+
+      /* 처마등 */
+      box(g, 98, 122, 2, 13, "#5f492b");
+      box(g, 94, 134, 9, 12, "#62492c");
+      box(g, 96, 136, 5, 7, "#fff1a4");
+
+      /* 굴뚝 */
+      if (!greenhouse) {
+        box(g, 191, 24, 19, 48, "#5c5c4e");
+
+        for (let y = 27; y < 69; y += 7) {
+          box(g, 193, y, 15, 4, "#92917c");
+          box(g, 194, y, 12, 1, "#c4b79b");
+        }
+
+        box(g, 187, 20, 27, 6, "#444d43");
+      }
+
+      /* 측면 장작 */
+      for (let j = 0; j < 15; j++) {
+        const x = 15 + j % 3 * 9;
+        const y = 155 + Math.floor(j / 3) * 7;
+
+        box(g, x, y, 8, 6, "#633c22");
+        box(g, x + 2, y + 1, 4, 4, "#d39a50");
+        box(g, x + 3, y + 2, 2, 2, "#8b592d");
+      }
+
+      /* 벽면 덩굴 */
+      for (let j = 0; j < 12; j++) {
+        const x = 205 + j % 3 * 4;
+        const y = 119 + Math.floor(j / 3) * 9;
+
+        box(g, x, y, 3, 10, "#3f8b35");
+        box(g, x - 3, y + 2, 6, 3, "#77bc39");
+      }
+    });
+  }
+
+  function terrain() {
+    const viewWidth = canvas.width / 0.8;
+    const viewHeight = canvas.height / 0.8;
+
+    box(
+      ctx,
+      0, 0,
+      WORLD.width,
+      WORLD.height,
+      "#79c936"
+    );
+
+    const startX = Math.max(
+      0, Math.floor(camera.x / 16) * 16
+    );
+
+    const startY = Math.max(
+      0, Math.floor(camera.y / 16) * 16
+    );
+
+    const endX = Math.min(
+      WORLD.width,
+      camera.x + viewWidth + 20
+    );
+
+    const endY = Math.min(
+      WORLD.height,
+      camera.y + viewHeight + 20
+    );
+
+    /* 균일한 체커보드 대신 풀잎 묘사 */
+    for (let y = startY; y < endY; y += 16) {
+      for (let x = startX; x < endX; x += 16) {
+        const s = noise(x, y, 2);
+
+        for (let j = 0; j < 9; j++) {
+          const xx =
+            x + Math.floor(noise(x + j * 11, y, 4) * 14);
+
+          const yy =
+            y + Math.floor(noise(x, y + j * 13, 9) * 14);
+
+          box(
+            ctx,
+            xx, yy,
+            2, 2 + j % 2,
+            grass[j % 5]
+          );
+        }
+
+        if (s > 0.989) {
+          flower(ctx, x + 7, y + 9, "#fff0ab");
+        }
+      }
+    }
+
+    const paths = [
+      [990, 0, 100, 2200],
+      [1995, 0, 110, 2200],
+      [0, 880, 3200, 92],
+      [0, 1600, 3200, 92],
+      [1440, 420, 110, 1780],
+      [990, 1080, 1115, 92]
+    ];
+
+    paths.forEach(([x, y, w, h]) => {
+      box(
+        ctx,
+        x - 4, y - 4,
+        w + 8, h + 8,
+        "#689a2f"
+      );
+
+      box(ctx, x, y, w, h, "#edbd55");
+    });
+
+    /* 길 위 작은 자갈 */
+    for (let y = startY; y < endY; y += 16) {
+      for (let x = startX; x < endX; x += 16) {
+        const onPath = paths.some(([a, b, w, h]) =>
+          x > a &&
+          x < a + w - 8 &&
+          y > b &&
+          y < b + h - 8
+        );
+
+        if (!onPath) continue;
+
+        const s = noise(x, y);
+
+        if (s < 0.5) {
+          box(ctx, x + 4, y + 6, 3, 2, "#dca444");
+        }
+
+        if (s > 0.7) {
+          box(ctx, x + 10, y + 9, 4, 1, "#ffda78");
+        }
+      }
+    }
+
+    /* 광장 돌길: 가운데에는 식물 전시 정원 */
+    for (let y = 1010; y < 1450; y += 24) {
+      for (let x = 1210; x < 1840; x += 30) {
+        if (
+          x > 1290 && x < 1720 &&
+          y > 1190 && y < 1400
+        ) {
+          continue;
+        }
+
+        box(ctx, x, y, 28, 22, "#a28e60");
+
+        box(
+          ctx,
+          x + 2, y + 2,
+          24, 17,
+          noise(x, y) > 0.5 ? "#e4d397" : "#d2bd85"
+        );
+
+        box(ctx, x + 3, y + 2, 22, 2, "#f9e5ac");
+      }
+    }
+
+    /* 연못 */
+    for (let row = -23; row <= 23; row++) {
+      const half = Math.floor(
+        Math.sqrt(
+          Math.max(0, 1 - (row / 24) ** 2)
+        ) * 35
+      ) * 8;
+
+      box(
+        ctx,
+        500 - half,
+        520 + row * 8,
+        half * 2,
+        8,
+        "#b28b38"
+      );
+
+      if (half > 18) {
+        box(
+          ctx,
+          518 - half,
+          520 + row * 8,
+          half * 2 - 36,
+          8,
+          "#39798d"
+        );
+      }
+
+      if (half > 36) {
+        box(
+          ctx,
+          536 - half,
+          520 + row * 8,
+          half * 2 - 72,
+          8,
+          "#59b5ca"
+        );
+      }
+    }
+
+    for (let j = 0; j < 35; j++) {
+      const x = 300 + j * 67 % 390;
+      const y = 405 + j * 41 % 200;
+
+      box(
+        ctx,
+        x, y,
+        8 + j % 4 * 3,
+        2,
+        j % 2 ? "#8edbe0" : "#419bb7"
+      );
+    }
+  }
+
+  function decor() {
+    /* 광장 식물 전시섬 */
+    [
+      [1370, 1300],
+      [1650, 1300]
+    ].forEach(([x, y]) => {
+      box(ctx, x - 53, y - 35, 106, 78, "#725a32");
+      box(ctx, x - 49, y - 31, 98, 68, "#e4c97d");
+      box(ctx, x - 44, y - 26, 88, 58, "#3b8038");
+
+      for (let j = 0; j < 7; j++) {
+        bush(
+          ctx,
+          x - 30 + j % 4 * 20,
+          y - 10 + Math.floor(j / 4) * 24,
+          j,
+          true
+        );
+      }
+    });
+
+    /* 화단 */
+    [
+      [1150, 1490, 10],
+      [1670, 1490, 8],
+      [2140, 690, 10],
+      [2760, 650, 9],
+      [1150, 580, 6]
+    ].forEach(([x, y, count]) => {
+      box(
+        ctx,
+        x - 8, y + 6,
+        count * 20 + 16, 11,
+        "#86612d"
+      );
+
+      box(
+        ctx,
+        x - 7, y + 7,
+        count * 20 + 14, 3,
+        "#d9a84d"
+      );
+
+      for (let i = 0; i < count; i++) {
+        bush(ctx, x + i * 20, y, i, true);
+      }
+    });
+
+    /* 짧은 목재 울타리 */
+    [
+      [1170, 1020],
+      [1830, 1020],
+      [2160, 1180],
+      [2900, 1540],
+      [1200, 1710]
+    ].forEach(([x, y]) => {
+      for (let j = 0; j < 5; j++) {
+        box(ctx, x + j * 18, y, 6, 27, "#67431f");
+
+        box(
+          ctx,
+          x + j * 18 + 1,
+          y + 2,
+          3, 21,
+          "#d3933a"
+        );
+      }
+
+      box(ctx, x, y + 7, 78, 4, "#aa6b29");
+      box(ctx, x, y + 18, 78, 4, "#bd7d30");
+    });
+
+    /* 큰길 밖의 낮은 덤불 */
+    for (let i = 0; i < 80; i++) {
+      const x = 100 + noise(i, 4) * 2900;
+      const y = 100 + noise(i, 8) * 1900;
+
+      if (
+        (x > 950 && x < 2110) ||
+        (y > 850 && y < 990) ||
+        (y > 1570 && y < 1720)
+      ) {
+        continue;
+      }
+
+      bush(ctx, x, y, i, i % 5 === 0);
+    }
+  }
+
+  function drawHouse(building, index) {
+    if (
+      !bioVisible(
+        building.x - 10,
+        building.y - 40,
+        building.w + 20,
+        building.h + 90
+      )
+    ) {
+      return;
+    }
+
+    const kind = /온실|배양/.test(building.name)
+      ? 2
+      : index % 3 === 0 ? 1 : 0;
+
+    ctx.drawImage(
+      house(kind),
+      building.x - 12,
+      building.y - 32,
+      building.w + 24,
+      building.h + 75
+    );
+
+    ctx.font = "bold 11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#493821";
+
+    ctx.fillText(
+      building.name,
+      building.x + building.w / 2,
+      building.y + building.h + 46
+    );
+
+    ctx.textAlign = "left";
+  }
+
+  function character(
+    x,
+    y,
+    color,
+    name,
+    player,
+    variant = 0
+  ) {
+    const image = sprite(
+      "person-" + color + "-" + variant,
+      32,
+      48,
+      g => {
+        box(g, 8, 42, 18, 4, "#24482d60");
+
+        box(g, 10, 32, 5, 10, "#3b5363");
+        box(g, 18, 32, 5, 10, "#3b5363");
+
+        box(g, 9, 40, 7, 3, "#543b2a");
+        box(g, 18, 40, 7, 3, "#543b2a");
+
+        polygon(
+          g,
+          [
+            [9, 20], [22, 20], [26, 25],
+            [24, 34], [8, 34], [6, 25]
+          ],
+          "#596c56"
+        );
+
+        box(g, 9, 22, 15, 11, "#fff3d1");
+        box(g, 14, 22, 6, 12, color);
+        box(g, 10, 22, 3, 13, "#fff8e2");
+        box(g, 21, 22, 3, 13, "#e5d7a9");
+
+        box(g, 6, 25, 4, 8, "#f9eac6");
+        box(g, 24, 25, 3, 8, "#f9eac6");
+        box(g, 7, 32, 3, 4, "#e9af72");
+        box(g, 24, 32, 3, 4, "#e9af72");
+
+        box(g, 10, 7, 14, 15, "#693d27");
+        box(g, 12, 10, 11, 12, "#f4bc83");
+        box(g, 13, 11, 8, 9, "#ffd59d");
+
+        box(g, 9, 6, 16, 6, "#593e28");
+        box(g, 10, 11, 3, 6, "#80532b");
+        box(g, 23, 10, 2, 7, "#80532b");
+
+        box(g, 14, 15, 2, 2, "#433626");
+        box(g, 20, 15, 2, 2, "#433626");
+        box(g, 17, 20, 3, 1, "#bd7955");
+        box(g, 11, 7, 9, 2, "#a57238");
+      }
+    );
+
+    ctx.drawImage(
+      image,
+      Math.round(x) - 22,
+      Math.round(y) - 42,
+      44,
+      66
+    );
+
+    if (name) {
+      ctx.font = "bold 11px sans-serif";
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#fff5ce";
+      ctx.strokeStyle = "#3e5130";
+      ctx.lineWidth = 3;
+
+      ctx.strokeText(name, x, y - 49);
+      ctx.fillText(name, x, y - 49);
+
+      ctx.textAlign = "left";
+    }
+  }
+
+  function stationsDraw() {
+    stations.forEach(station => {
+      const x = station.x;
+      const y = station.y;
+
+      box(ctx, x - 22, y + 12, 50, 7, "#3d563c60");
+      box(ctx, x - 22, y - 4, 45, 21, "#86572b");
+      box(ctx, x - 25, y - 7, 51, 5, "#e0b86d");
+
+      box(ctx, x - 18, y - 29, 37, 22, "#536b68");
+      box(ctx, x - 15, y - 26, 31, 16, "#e5e7c6");
+      box(ctx, x - 9, y - 23, 20, 10, "#56aebb");
+      box(ctx, x - 7, y - 22, 8, 3, "#c0efce");
+      box(ctx, x + 13, y - 8, 4, 3, "#fbd674");
+
+      if (
+        station.type === "culture" ||
+        station.type === "cross"
+      ) {
+        bush(ctx, x, y - 23, 2);
+      }
+
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#453c23";
+
+      ctx.fillText(station.name, x, y + 31);
+      ctx.textAlign = "left";
+    });
+  }
+
+  return {
+    terrain,
+    decor,
+    drawHouse,
+    tree,
+    character,
+    stationsDraw
+  };
+})();
+
+/* 건물 크기 축소: 기존 중심과 앞쪽 위치 유지 */
+const bloomOriginalBuildings = bioBuildings;
+
+bioBuildings = function() {
+  return bloomOriginalBuildings().map(building => {
+    const width = Math.min(building.w, 330);
+    const height = Math.min(building.h, 245);
+
+    return {
+      ...building,
+      x: building.x + (building.w - width) / 2,
+      y: building.y + building.h - height,
+      w: width,
+      h: height
+    };
+  });
+};
+
+/* 광장과 연구동 외곽에 나무 추가 */
+[
+  [1140, 740],
+  [1195, 810],
+  [1850, 760],
+  [1900, 835],
+  [1140, 1190],
+  [1130, 1320],
+  [1870, 1180],
+  [1910, 1330],
+  [1160, 1510],
+  [1810, 1510],
+  [1260, 560],
+  [1830, 550],
+  [2170, 770],
+  [2690, 700],
+  [2630, 1100]
+].forEach(([x, y]) => {
+  const occupied = treePositions.some(tree =>
+    Math.abs(tree.x - x) < 35 &&
+    Math.abs(tree.y - y) < 35
+  );
+
+  if (!occupied) {
+    treePositions.push({ x, y });
+  }
+});
+
+drawCharacter = BLOOM.character;
+
+/* 새 렌더러 연결 */
+draw = function() {
+  const zoom = 0.8;
+  const viewWidth = canvas.width / zoom;
+  const viewHeight = canvas.height / zoom;
+
+  camera.x = Math.max(
+    0,
+    Math.min(
+      WORLD.width - viewWidth,
+      state.player.x - viewWidth / 2
+    )
+  );
+
+  camera.y = Math.max(
+    0,
+    Math.min(
+      WORLD.height - viewHeight,
+      state.player.y - viewHeight / 2
+    )
+  );
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  ctx.imageSmoothingEnabled = false;
+  ctx.save();
+
+  ctx.scale(zoom, zoom);
+
+  ctx.translate(
+    -Math.floor(camera.x),
+    -Math.floor(camera.y)
+  );
+
+  BLOOM.terrain();
+  BLOOM.decor();
+
+  drawSamples();
+  drawPlots();
+  BLOOM.stationsDraw();
+
+  /* 발 위치를 기준으로 앞뒤 관계 결정 */
+  const layers = bioBuildings().map((building, index) => ({
+    y: building.y + building.h,
+
+    paint: () => {
+      BLOOM.drawHouse(building, index);
+    }
+  }));
+
+  treePositions.forEach((tree, index) => {
+    layers.push({
+      y: tree.y,
+
+      paint: () => {
+        if (
+          !bioVisible(
+            tree.x - 55,
+            tree.y - 140,
+            110,
+            160
+          )
+        ) {
+          return;
+        }
+
+        ctx.drawImage(
+          BLOOM.tree(index % 3 === 0 ? 1 : 0),
+          tree.x - 48,
+          tree.y - 116,
+          96,
+          132
+        );
+      }
+    });
+  });
+
+  DATA.npcs.forEach((npc, index) => {
+    layers.push({
+      y: npc.y,
+
+      paint: () => {
+        BLOOM.character(
+          npc.x,
+          npc.y,
+          npc.color,
+          npc.name,
+          false,
+          index
+        );
+      }
+    });
+  });
+
+  layers.push({
+    y: state.player.y,
+
+    paint: () => {
+      BLOOM.character(
+        state.player.x,
+        state.player.y,
+        DATA.roles[state.player.role].color,
+        state.player.name,
+        true
+      );
+    }
+  });
+
+  layers.sort((a, b) => a.y - b.y);
+
+  layers.forEach(item => {
+    item.paint();
+  });
+
+  ctx.restore();
+
+  drawLightOverlay();
+
+  if (state.weather === "rain") {
+    drawRain();
+  }
+
+  bioDrawMiniMap();
+};
+
+/* BLOOM V7 끝 */
 })();
