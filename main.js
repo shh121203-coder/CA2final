@@ -7216,7 +7216,6 @@ function plotPosition(index) {
       ctx.stroke();
     }
   }
-})();
 /* =====================================================
    BIO LAB 확장 지도 통합 패치
    파일 마지막의 })(); 바로 위에 붙이기
@@ -7743,3 +7742,4 @@ useStation = function(station) {
 };
 
 /* BIO LAB 확장 지도 통합 패치 끝 */
+})();
