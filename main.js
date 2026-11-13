@@ -663,7 +663,7 @@ for (let i = 0; i < 26; i++) {
         .getElementById("modal")
         .classList.contains("hidden");
 
-    if (modalIsOpen) {
+    if (modalIsOpen || document.getElementById('appearance-dialog')?.open) {
       return;
     }
 
@@ -9077,8 +9077,8 @@ const BLOOM = (() => {
       const greenhouse = kind === 2;
 
       const roofColor = kind === 1
-        ? "#427b92"
-        : "#bb4326";
+        ? "#657f80"
+        : "#ba583b";
 
       box(g, 22, 193, 221, 18, "#343c3560");
 
@@ -9156,16 +9156,16 @@ const BLOOM = (() => {
           x += 21
         ) {
           const tileColor = kind === 1
-            ? "#588fa3"
+            ? "#739192"
             : noise(x, y) > 0.5
-              ? "#d35b30"
-              : "#bb4529";
+              ? "#cb724c"
+              : "#ad5139";
 
           box(g, x, y, 19, 10, tileColor);
 
           box(
             g, x, y, 18, 2,
-            kind === 1 ? "#9bc9cd" : "#f6934b"
+            kind === 1 ? "#adbfba" : "#e59c67"
           );
 
           box(
@@ -9260,6 +9260,31 @@ const BLOOM = (() => {
       }
 
       /* 벽면 덩굴 */
+      /* 창 아래 화분·나무 덧문·처마 덩굴: 이동 판정은 건드리지 않음 */
+      if (!greenhouse) {
+        [56, 176].forEach((wx, index) => {
+          box(g, wx - 7, 126, 5, 28, '#54704b');
+          box(g, wx + 26, 126, 5, 28, '#54704b');
+          for (let yy = 130; yy < 152; yy += 5) {
+            box(g, wx - 6, yy, 3, 1, '#8ca070');
+            box(g, wx + 27, yy, 3, 1, '#8ca070');
+          }
+          box(g, wx - 3, 155, 30, 7, '#855338');
+          box(g, wx - 4, 154, 32, 2, '#bd8b58');
+          for (let j = 0; j < 6; j++) {
+            const xx = wx + j * 4;
+            box(g, xx, 150 - j % 2 * 2, 4, 5, '#427649');
+            box(g, xx + 1, 148 - j % 2 * 2, 3, 3, index ? '#e5ba68' : '#e5a69b');
+          }
+        });
+        for (let j = 0; j < 24; j++) {
+          const xx = 32 + j * 8;
+          const yy = 113 + Math.round(Math.sin(j * .65) * 3);
+          box(g, xx, yy, 6, 5, '#3b6844');
+          box(g, xx + 2, yy - 1, 4, 3, '#78a25b');
+          if (j % 4 === 0) box(g, xx + 1, yy + 2, 3, 3, '#efcba4');
+        }
+      }
       for (let j = 0; j < 12; j++) {
         const x = 205 + j % 3 * 4;
         const y = 119 + Math.floor(j / 3) * 9;
@@ -10849,7 +10874,8 @@ const BIO_MOTION = (() => {
     direction,
     frame,
     working,
-    blink
+    blink,
+    look = null
   ) {
     const key = [
       color,
@@ -10857,7 +10883,8 @@ const BIO_MOTION = (() => {
       direction,
       frame,
       working,
-      blink
+      blink,
+      JSON.stringify(look)
     ].join("|");
 
     if (images.has(key)) {
@@ -10873,7 +10900,18 @@ const BIO_MOTION = (() => {
     g.imageSmoothingEnabled = false;
 
     const box = (x, y, w, h, c) => {
-      rect(g, x, y, w, h, c);
+      const skin = look && BIO_STYLE.skin[look.skin];
+      const tones = skin ? {
+        '#c9946d': skin[0], '#ddaa7c': skin[0], '#f4c695': skin[1],
+        '#ffdbab': skin[2], '#e6b185': skin[1], '#d79d73': skin[0],
+        '#e4ab7e': skin[1], '#edb392': skin[0]
+      } : {};
+      if (look && c === '#354652') c = BIO_STYLE.pants[look.pants];
+      if (look && look.outfit !== 0) {
+        const cloth = BIO_STYLE.clothes[look.clothes];
+        if (['#e8e3cc','#fff5da','#c7d0bd','#fffbed','#fff1cf','#e7e4cb'].includes(c)) c = cloth;
+      }
+      rect(g, x, y, w, h, tones[c] || c);
     };
 
     const hairIndex =
@@ -10882,7 +10920,8 @@ const BIO_MOTION = (() => {
         hairColors.length
       ) % hairColors.length;
 
-    const hair = hairColors[hairIndex];
+    const hair = look ? BIO_STYLE.hair[look.hair] : hairColors[hairIndex];
+    const hairStyle = look ? look.style : variant % 3;
 
     const side =
       direction === "left" ||
@@ -11004,11 +11043,11 @@ const BIO_MOTION = (() => {
     box(20, 8, 3, 8, hair[0]);
 
     /* 서로 다른 헤어 실루엣 */
-    if (variant % 3 === 0) {
+    if (hairStyle === 0 || hairStyle === 3) {
       box(7, 8, 3, 12, hair[0]);
       box(21, 8, 3, 14, hair[0]);
       box(22, 17, 3, 4, hair[1]);
-    } else if (variant % 3 === 1) {
+    } else if (hairStyle === 1 || hairStyle === 4) {
       box(9, 9, 7, 3, hair[1]);
       box(14, 8, 4, 3, hair[1]);
       box(16, 9, 3, 2, hair[2]);
@@ -11089,8 +11128,41 @@ const BIO_MOTION = (() => {
       box(10, 17, 2, 1, "#edb392");
     }
 
+    if (look) {
+      if (hairStyle === 3) {
+        box(5, 8, 4, 17, hair[0]); box(23, 8, 3, 17, hair[0]);
+        box(6, 10, 2, 12, hair[1]);
+      }
+      if (hairStyle === 4) {
+        box(21, 4, 5, 7, hair[0]); box(22, 5, 3, 4, hair[1]);
+      }
+      if (hairStyle === 5) {
+        box(5, 6, 5, 6, hair[0]); box(22, 6, 5, 6, hair[0]);
+        box(7, 3, 5, 5, hair[1]); box(19, 3, 5, 5, hair[1]);
+      }
+      if (look.outfit === 2) {
+        box(10, 26, 10, 8, BIO_STYLE.clothes[look.clothes]);
+        box(11, 21, 2, 7, '#b29463'); box(18, 21, 2, 7, '#b29463');
+        box(13, 28, 4, 3, '#dcc89b');
+      }
+      if (look.accessory === 1 && !back) {
+        if (!side) {
+          box(10, 12, 6, 5, '#463f38'); box(17, 12, 6, 5, '#463f38');
+          box(11, 13, 4, 3, '#c0d5c9'); box(18, 13, 4, 3, '#c0d5c9');
+          box(16, 13, 1, 1, '#463f38');
+        } else box(direction === 'right' ? 18 : 10, 12, 5, 4, '#463f38');
+      }
+      if (look.accessory === 2) {
+        box(7, 2, 17, 6, '#b68b48'); box(4, 7, 23, 2, '#e5c17b');
+        box(8, 5, 15, 2, '#765539');
+      }
+      if (look.accessory === 3) {
+        box(8, 5, 15, 2, '#bc6a55'); box(21, 4, 4, 4, '#edb69c');
+      }
+    }
     g.restore();
 
+    if (images.size > 512) images.clear();
     images.set(key, sprite);
     return sprite;
   }
@@ -11353,12 +11425,13 @@ const BIO_MOTION = (() => {
 
     ctx.drawImage(
       picture(
-        color,
+        player ? BIO_STYLE.clothes[BIO_STYLE.clean(state.player.appearance).clothes] : color,
         appearance,
         direction,
         frame,
         Boolean(working),
-        blink
+        blink,
+        player ? BIO_STYLE.clean(state.player.appearance) : null
       ),
       Math.round(x) - 22,
       Math.round(y) - 49 + idleOffset,
@@ -11387,7 +11460,8 @@ const BIO_MOTION = (() => {
 
   return {
     begin,
-    draw
+    draw,
+    picture
   };
 })();
 
@@ -12037,7 +12111,7 @@ const BIO_GARDEN = (() => {
         box(
           g,
           0, 0, 256, 256,
-          wet ? "#80a760" : "#78b53d"
+          wet ? "#628c62" : "#6b9e4b"
         );
 
         for (let y = 0; y < 256; y += 8) {
@@ -12053,10 +12127,10 @@ const BIO_GARDEN = (() => {
               x + 2, y + 3,
               2, 3,
               n > 0.6
-                ? "#a6ce55"
+                ? "#98bd65"
                 : n > 0.3
-                  ? "#689c36"
-                  : "#8cbf44"
+                  ? "#568743"
+                  : "#7eae56"
             );
 
             if (n > 0.97) {
@@ -12558,4 +12632,119 @@ window.addEventListener(
 fitGardenCanvas();
 
 /* BIO GARDEN V11 끝 */
+
+/* BIO LAB V12 · 외형은 전공/능력치와 별도로 저장합니다. */
+const BIO_STYLE = (() => {
+  const skin = [
+    ['#d49b76','#f1c49f','#ffdcba'], ['#b97f58','#dba67c','#efc49b'],
+    ['#936044','#b98159','#d49d73'], ['#704b38','#956747','#b58360'],
+    ['#53392e','#75513d','#956c50']
+  ];
+  const hair = [
+    ['#292c2b','#414741','#687064'], ['#39281f','#70492e','#a87948'],
+    ['#663b26','#a46639','#cd9658'], ['#715535','#b38b51','#dfbc7c'],
+    ['#512e28','#884c35','#bd7851'], ['#565650','#95998d','#c9cbbd']
+  ];
+  const clothes = ['#548365','#537d94','#b56b53','#bb9955','#817494','#e1d6b9'];
+  const pants = ['#394e60','#594c40','#3f5848','#655568'];
+  const defaults = {skin:0,hair:1,style:1,outfit:0,clothes:0,pants:0,accessory:0};
+  const fields = [
+    ['style','머리 모양',['단발','가르마','짧은 머리','긴 머리','묶은 머리','곱슬 머리']],
+    ['hair','머리색',['흑발','갈색','밤색','금갈색','적갈색','은회색']],
+    ['skin','피부색',['밝은 베이지','베이지','브론즈','브라운','딥 브라운']],
+    ['outfit','의상',['연구 가운','필드 재킷','원예 작업복']],
+    ['clothes','의상 색',['잎사귀','호수','테라코타','밀짚','라벤더','크림']],
+    ['pants','바지',['남색','갈색','녹색','자두색']],
+    ['accessory','액세서리',['없음','안경','밀짚모자','헤어밴드']]
+  ];
+  function clean(value) {
+    const next = {...defaults};
+    for (const [key,,options] of fields) {
+      const n = value?.[key];
+      if (Number.isInteger(n) && n >= 0 && n < options.length) next[key] = n;
+    }
+    return next;
+  }
+  let draft = {...defaults};
+  let direction = 'down';
+  let editing = false;
+  let trigger = null;
+  const panel = document.createElement('dialog');
+  panel.id = 'appearance-dialog';
+  panel.className = 'appearance-dialog';
+  panel.setAttribute('aria-labelledby','appearance-title');
+  panel.innerHTML = `<form method="dialog">
+    <h2 id="appearance-title">나의 연구원</h2>
+    <p>외형과 전공은 별개예요. 게임 중에도 바꿀 수 있어요.</p>
+    <div class="appearance-body"><div class="appearance-stage">
+    <canvas id="appearance-preview" width="112" height="184" aria-label="선택한 외형 미리보기"></canvas>
+    <button type="button" id="appearance-turn">방향 돌리기</button></div>
+    <div class="appearance-fields">${fields.map(([key,label,options]) =>
+      `<label>${label}<select data-look="${key}">${options.map((name,i)=>`<option value="${i}">${name}</option>`).join('')}</select></label>`).join('')}</div></div>
+    <p id="appearance-note">연구 가운에서는 의상 색이 안쪽 셔츠에 적용됩니다.</p>
+    <div class="appearance-actions"><button type="button" id="appearance-random">무작위 조합</button>
+    <button value="cancel">취소</button><button value="apply">이 외형으로 결정</button></div>
+    </form>`;
+  document.body.append(panel);
+  window.addEventListener('keydown', event => {
+    if (panel.open) event.stopImmediatePropagation();
+  }, true);
+  const preview = panel.querySelector('canvas');
+  const selects = [...panel.querySelectorAll('select')];
+  function render() {
+    for (const select of selects) select.value = String(draft[select.dataset.look]);
+    const g = preview.getContext('2d');
+    g.clearRect(0,0,112,184);
+    g.imageSmoothingEnabled = false;
+    g.drawImage(BIO_MOTION.picture(clothes[draft.clothes],0,direction,0,false,false,draft),0,0,112,184);
+  }
+  function open(inGame, source) {
+    editing = inGame;
+    trigger = source;
+    draft = clean(inGame ? state.player.appearance : chosen);
+    for (const key of Object.keys(keys)) keys[key] = false;
+    panel.returnValue = '';
+    direction = 'down';
+    render();
+    panel.showModal();
+    selects[0].focus();
+  }
+  selects.forEach(select => select.addEventListener('change',()=>{
+    draft[select.dataset.look] = Number(select.value);
+    render();
+  }));
+  panel.querySelector('#appearance-turn').addEventListener('click',()=>{
+    const dirs = ['down','left','up','right'];
+    direction = dirs[(dirs.indexOf(direction)+1)%4]; render();
+  });
+  panel.querySelector('#appearance-random').addEventListener('click',()=>{
+    for (const [key,,options] of fields) draft[key] = Math.floor(Math.random()*options.length);
+    render();
+  });
+  let chosen = {...defaults};
+  panel.addEventListener('close',()=>{
+    if (panel.returnValue === 'apply') {
+      chosen = clean(draft);
+      if (editing) { state.player.appearance = {...chosen}; saveGame(false); }
+    } else draft = editing ? clean(state.player.appearance) : {...chosen};
+    trigger?.focus();
+  });
+  const startButton = document.createElement('button');
+  startButton.type = 'button'; startButton.className = 'appearance-open';
+  startButton.textContent = '연구원 외형 꾸미기';
+  document.getElementById('role-options').after(startButton);
+  startButton.addEventListener('click',()=>open(false,startButton));
+  const gameButton = document.createElement('button');
+  gameButton.type = 'button'; gameButton.className = 'appearance-open appearance-game';
+  gameButton.textContent = '외형 변경';
+  document.getElementById('save-btn').before(gameButton);
+  gameButton.addEventListener('click',()=>open(true,gameButton));
+  const previousStart = startGame;
+  startGame = function(loaded = null) {
+    if (loaded) loaded.player.appearance = clean(loaded.player.appearance);
+    previousStart(loaded);
+    if (!loaded) state.player.appearance = {...chosen};
+  };
+  return {skin,hair,clothes,pants,clean};
+})();
 })();
