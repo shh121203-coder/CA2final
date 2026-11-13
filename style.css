@@ -1904,3 +1904,86 @@ body {
     white-space: nowrap;
   }
 }
+/* BLOOM V7 · 화면 UI 정리 */
+
+#hud {
+  padding: 8px 12px;
+  background: #fff0b6;
+  border-width: 3px;
+  box-shadow:
+    inset 0 0 0 2px #fff9df,
+    0 3px 0 #604025;
+}
+
+#hud .brand strong {
+  color: #357b3e;
+  text-shadow: 1px 1px #d2e882;
+}
+
+.hud-group {
+  border-right-width: 2px;
+}
+
+.side-panel {
+  background: #fff3c9;
+  border-width: 3px;
+  box-shadow:
+    inset 0 0 0 2px #fffaf0,
+    3px 3px 0 #65452b;
+}
+
+.side-panel h2 {
+  font-size: 16px;
+  border-bottom: 2px solid #c59a57;
+}
+
+.side-panel,
+#quest-card,
+#daily-card {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.side-row {
+  padding: 8px 2px;
+  border-bottom: 1px solid #d8bd83;
+}
+
+.tab {
+  color: #49351f;
+  background: #e9c27a;
+  border-width: 2px;
+  box-shadow: inset 0 0 0 1px #fff0bb;
+}
+
+.tab.active {
+  color: #264f2a;
+  background: #a9d86c;
+}
+
+#canvas-wrap {
+  border: 3px solid #604329;
+  box-shadow:
+    0 0 0 2px #e8c875,
+    3px 3px 0 #382e22;
+}
+
+@media (min-width: 1100px) {
+  .game-layout {
+    grid-template-columns:
+      205px
+      minmax(0, 1fr)
+      210px;
+    gap: 10px;
+  }
+
+  .side-panel {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interaction-hint {
+    animation: none;
+  }
+}
