@@ -10224,4 +10224,563 @@ drawPlots = function() {
 };
 
 /* 작물 패치 끝 */
+/* =====================================================
+   BLOOM V9 · 장비별 외형과 지역별 풍경
+===================================================== */
+
+const BLOOM9 = (() => {
+  function rect(x, y, w, h, color) {
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+      Math.round(x),
+      Math.round(y),
+      w,
+      h
+    );
+  }
+
+  function line(points, color, width = 2) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+
+    points.forEach((point, index) => {
+      if (index === 0) {
+        ctx.moveTo(...point);
+      } else {
+        ctx.lineTo(...point);
+      }
+    });
+
+    ctx.stroke();
+  }
+
+  function pot(x, y, color = "#ef6994") {
+    rect(x - 7, y, 14, 13, "#a4542a");
+    rect(x - 9, y - 3, 18, 5, "#edaa55");
+
+    rect(x - 2, y - 17, 3, 14, "#367c37");
+    rect(x - 10, y - 12, 9, 4, "#64b739");
+    rect(x + 1, y - 17, 8, 4, "#87cd42");
+
+    rect(x - 4, y - 22, 8, 7, color);
+    rect(x - 7, y - 19, 14, 3, color);
+    rect(x - 1, y - 20, 3, 3, "#ffe98a");
+  }
+
+  function rock(x, y, size = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(size, size);
+
+    rect(-12, -3, 25, 13, "#68715b");
+    rect(-9, -9, 17, 17, "#9b9d78");
+    rect(-5, -11, 9, 5, "#c6bd8b");
+    rect(-8, -6, 3, 8, "#b9b58b");
+    rect(3, 0, 6, 7, "#828669");
+
+    ctx.restore();
+  }
+
+  function sign(x, y, label) {
+    rect(x - 2, y, 5, 31, "#805528");
+    rect(x - 42, y - 22, 84, 24, "#694422");
+    rect(x - 39, y - 19, 78, 17, "#d6a854");
+    rect(x - 37, y - 18, 74, 2, "#ffe09b");
+
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#56391f";
+    ctx.fillText(label, x, y - 7);
+    ctx.textAlign = "left";
+  }
+
+  function bench(x, y) {
+    rect(x - 23, y - 18, 46, 5, "#d99b43");
+    rect(x - 23, y - 10, 46, 5, "#c58635");
+    rect(x - 26, y, 52, 7, "#e7b65b");
+
+    rect(x - 21, y + 7, 5, 10, "#76502b");
+    rect(x + 16, y + 7, 5, 10, "#76502b");
+
+    rect(x - 22, y - 20, 3, 25, "#76502b");
+    rect(x + 19, y - 20, 3, 25, "#76502b");
+  }
+
+  function screen(x, y, w = 22, h = 14) {
+    rect(x - 3, y - 3, w + 6, h + 6, "#4a665f");
+    rect(x, y, w, h, "#6ecbc8");
+    rect(x + 2, y + 2, w - 4, 2, "#cdf7d9");
+    rect(x + 3, y + 6, 5, 2, "#f6e798");
+    rect(x + 10, y + 6, w - 13, 2, "#358c96");
+  }
+
+  function tube(x, y, color) {
+    rect(x, y, 5, 17, "#d3ebd7");
+    rect(x + 1, y + 6, 3, 9, color);
+    rect(x - 1, y - 2, 7, 4, "#78958b");
+  }
+
+  /* 시설별로 서로 다른 형태를 그린다 */
+  function equipment(station) {
+    if (
+      !bioVisible(
+        station.x - 55,
+        station.y - 85,
+        110,
+        145
+      )
+    ) {
+      return;
+    }
+
+    ctx.save();
+
+    ctx.translate(
+      Math.round(station.x),
+      Math.round(station.y)
+    );
+
+    rect(-30, 17, 62, 7, "#3e583b40");
+
+    const type = station.type;
+
+    if (type === "shop") {
+      /* 씨앗 상점 */
+      rect(-41, -8, 82, 29, "#9e6630");
+      rect(-44, -12, 88, 6, "#efc279");
+
+      rect(-37, -63, 4, 51, "#84532a");
+      rect(33, -63, 4, 51, "#84532a");
+
+      for (let i = 0; i < 8; i++) {
+        rect(
+          -48 + i * 12,
+          -66,
+          12,
+          19,
+          i % 2 ? "#fff2bd" : "#e76b45"
+        );
+      }
+
+      rect(-48, -47, 96, 5, "#874c29");
+
+      const seedColors = [
+        "#75b84a",
+        "#efbc45",
+        "#e96a54",
+        "#c98bb8"
+      ];
+
+      for (let i = 0; i < 4; i++) {
+        rect(-31 + i * 18, -27, 13, 14, "#e8cf8c");
+        rect(-28 + i * 18, -24, 7, 7, seedColors[i]);
+      }
+    } else if (type === "scope") {
+      /* 현미경 */
+      rect(-29, 0, 58, 6, "#e6bc77");
+      rect(-24, 6, 5, 15, "#8a6335");
+      rect(19, 6, 5, 15, "#8a6335");
+
+      rect(-13, -6, 27, 6, "#3f6262");
+      rect(-8, -14, 21, 5, "#b9d2bf");
+
+      line(
+        [[11, -12], [13, -30], [3, -43]],
+        "#547d79",
+        7
+      );
+
+      line(
+        [[9, -12], [10, -29], [0, -42]],
+        "#b8dacc",
+        3
+      );
+
+      line(
+        [[-4, -46], [7, -38]],
+        "#425d5a",
+        9
+      );
+
+      rect(-10, -49, 9, 7, "#7ca8a1");
+      rect(-11, -51, 7, 3, "#c8ece0");
+
+      rect(-8, -18, 21, 3, "#4c6b64");
+      rect(3, -21, 8, 3, "#f8f0c7");
+    } else if (type === "pcr") {
+      /* PCR 장비 */
+      rect(-27, -30, 54, 45, "#526e69");
+      rect(-24, -28, 48, 39, "#f1e6be");
+
+      rect(-23, -40, 46, 13, "#6f9d96");
+      rect(-19, -37, 38, 7, "#c7e3cc");
+
+      screen(-17, -21, 22, 13);
+
+      [
+        "#79c951",
+        "#eec958",
+        "#ed8161"
+      ].forEach((color, i) => {
+        rect(12, -18 + i * 7, 5, 4, color);
+      });
+
+      rect(-20, 7, 40, 3, "#a8b59d");
+    } else if (
+      type === "culture" ||
+      type === "contamination"
+    ) {
+      /* 배양 장비 */
+      rect(-31, -51, 62, 65, "#506f63");
+      rect(-27, -47, 54, 56, "#d9dfb4");
+      rect(-23, -43, 46, 41, "#96ccbb");
+
+      rect(-21, -41, 3, 34, "#e7f4cd");
+      rect(-23, -20, 46, 3, "#5d9281");
+      rect(-26, 0, 52, 6, "#f5edc5");
+
+      for (let i = 0; i < 3; i++) {
+        tube(
+          -16 + i * 14,
+          -38,
+          type === "culture"
+            ? "#64b964"
+            : "#cba85a"
+        );
+
+        tube(
+          -16 + i * 14,
+          -16,
+          "#7bcc91"
+        );
+      }
+
+      rect(17, -45, 4, 46, "#689b86");
+    } else if (type === "pond") {
+      /* 표본 채취대 */
+      rect(-24, -3, 48, 19, "#8b673c");
+
+      for (let i = 0; i < 4; i++) {
+        rect(
+          -23 + i * 12,
+          -2,
+          10,
+          17,
+          "#d7ac64"
+        );
+      }
+
+      tube(-7, -23, "#6dc6db");
+
+      rect(5, -13, 12, 10, "#e8dca4");
+      rect(7, -11, 8, 5, "#87c2a8");
+    } else if (type === "bed") {
+      /* 숙소 휴식 지점 */
+      rect(-33, -14, 66, 27, "#76502b");
+      rect(-30, -13, 60, 20, "#e4bf74");
+      rect(-27, -12, 19, 16, "#fff2c9");
+
+      rect(-5, -12, 32, 20, "#78a7a0");
+      rect(-2, -10, 26, 3, "#acd8c2");
+
+      rect(-34, -23, 5, 44, "#996c36");
+      rect(29, -15, 5, 36, "#996c36");
+    } else if (type === "cross") {
+      /* 교배 실험대 */
+      rect(-37, -4, 74, 23, "#81572d");
+      rect(-34, -1, 68, 15, "#d7a354");
+
+      pot(-19, -11, "#f7c959");
+      pot(17, -11, "#f18ab1");
+
+      line(
+        [[-11, -36], [0, -43], [12, -36]],
+        "#f7e7b0",
+        2
+      );
+    } else if (type === "climate") {
+      /* 기후 관측 장비 */
+      rect(-28, -40, 56, 53, "#6a8780");
+      rect(-24, -36, 48, 45, "#e0e4be");
+
+      screen(-17, -29, 29, 20);
+
+      rect(-2, -75, 4, 35, "#657c6a");
+
+      line(
+        [[-18, -67], [18, -67]],
+        "#87633b",
+        3
+      );
+
+      rect(12, -72, 9, 8, "#edb94a");
+      rect(-22, -69, 6, 5, "#a8d4bd");
+
+      rect(14, -28, 4, 19, "#b3cfc0");
+      rect(15, -18, 2, 8, "#e97b56");
+    } else if (type === "gel") {
+      /* 전기영동 장비 */
+      rect(-30, -22, 60, 34, "#537477");
+      rect(-26, -19, 52, 27, "#a5d6c9");
+      rect(-21, -15, 42, 19, "#3b929e");
+
+      for (let i = 0; i < 4; i++) {
+        rect(
+          -16 + i * 10,
+          -11,
+          5,
+          2,
+          "#dbf3a4"
+        );
+
+        rect(
+          -16 + i * 10,
+          -4 + i % 2 * 3,
+          5,
+          2,
+          "#96e2b5"
+        );
+      }
+
+      rect(-26, -25, 52, 4, "#dfecc7");
+    } else if (type === "enzyme") {
+      /* 효소 반응대 */
+      rect(-29, 4, 58, 9, "#a47b41");
+
+      rect(-17, -35, 7, 37, "#769283");
+      rect(12, -35, 5, 37, "#769283");
+      rect(-21, -37, 42, 4, "#b4c8aa");
+
+      tube(-6, -24, "#edbf54");
+      tube(4, -24, "#a5d971");
+
+      rect(-10, -1, 27, 4, "#e5e4be");
+    } else {
+      /* 기록·서열 분석 단말기 */
+      rect(-27, 0, 54, 19, "#94632e");
+      rect(-30, -4, 60, 6, "#e6b970");
+
+      screen(-21, -35, 42, 25);
+
+      rect(-2, -8, 4, 4, "#7a8a70");
+      rect(-17, -1, 34, 3, "#f4e5ba");
+
+      if (type === "sequence") {
+        const bases = [
+          "#ea9773",
+          "#edcf68",
+          "#a4de8b",
+          "#b0bce6"
+        ];
+
+        for (let i = 0; i < 5; i++) {
+          rect(
+            -17 + i * 7,
+            -22,
+            4,
+            4,
+            bases[i % 4]
+          );
+        }
+      }
+    }
+
+    /* 장비 이름 */
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+
+    ctx.strokeStyle = "#fff2c7";
+    ctx.lineWidth = 3;
+    ctx.strokeText(station.name, 0, 37);
+
+    ctx.fillStyle = "#5a4325";
+    ctx.fillText(station.name, 0, 37);
+
+    ctx.textAlign = "left";
+    ctx.restore();
+  }
+
+  function landscape() {
+    /* 생태숲 수변 */
+    for (let i = 0; i < 16; i++) {
+      const angle = i / 16 * Math.PI * 2;
+
+      const x = 500 + Math.cos(angle) * 300;
+      const y = 520 + Math.sin(angle) * 205;
+
+      rock(x, y, 0.8 + i % 3 * 0.2);
+    }
+
+    sign(790, 760, "생태 관찰로");
+    bench(720, 800);
+
+    for (let i = 0; i < 14; i++) {
+      const x = 240 + i * 31;
+      const y = 735 + i % 3 * 11;
+
+      rect(x, y - 20, 2, 23, "#648834");
+      rect(x - 2, y - 23, 6, 10, "#c3a653");
+    }
+
+    /* 분자 연구단지 보조 작업대 */
+    [
+      [330, 1410],
+      [720, 1510]
+    ].forEach(([x, y]) => {
+      rect(x - 28, y, 56, 27, "#6d887a");
+      rect(x - 24, y - 4, 48, 5, "#d3d8b2");
+
+      for (let i = 0; i < 4; i++) {
+        tube(
+          x - 17 + i * 11,
+          y - 22,
+          i % 2 ? "#82c9c9" : "#e9ad6d"
+        );
+      }
+    });
+
+    sign(810, 1570, "분자 연구단지");
+
+    /* 종자 보존림의 종자 서랍 */
+    rect(770, 1870, 70, 65, "#79502a");
+
+    for (let row = 0; row < 3; row++) {
+      for (let column = 0; column < 4; column++) {
+        rect(
+          774 + column * 16,
+          1874 + row * 19,
+          14,
+          16,
+          "#c08a41"
+        );
+
+        rect(
+          778 + column * 16,
+          1880 + row * 19,
+          6,
+          3,
+          "#f1d396"
+        );
+      }
+    }
+
+    for (let i = 0; i < 5; i++) {
+      pot(
+        210 + i * 27,
+        1990,
+        i % 2 ? "#d39ddd" : "#ffcb68"
+      );
+    }
+
+    sign(820, 2010, "종자 보존림");
+
+    /* 생활마을 */
+    bench(1740, 2100);
+    pot(1690, 2100);
+    pot(1790, 2100, "#9fbded");
+
+    /* 우편함 */
+    rect(1560, 2080, 5, 35, "#8e6936");
+    rect(1547, 2066, 31, 20, "#e8be67");
+    rect(1549, 2070, 27, 2, "#fff0b0");
+    rect(1554, 2077, 16, 3, "#826331");
+
+    /* 온실 구역 생육 트레이 */
+    for (let i = 0; i < 4; i++) {
+      const x = 2200 + i * 115;
+      const y = 750;
+
+      rect(x, y, 83, 30, "#855b2d");
+      rect(x + 3, y + 3, 77, 24, "#b38b48");
+
+      for (let j = 0; j < 6; j++) {
+        rect(
+          x + 9 + j * 11,
+          y + 10,
+          7,
+          10,
+          "#537a2d"
+        );
+
+        rect(
+          x + 11 + j * 11,
+          y + 5,
+          3,
+          8,
+          "#a6dc54"
+        );
+      }
+    }
+
+    /* 시험 재배지 관수관 */
+    const irrigation = [
+      [2150, 1200],
+      [2150, 1730],
+      [2910, 1730]
+    ];
+
+    line(irrigation, "#4f7e78", 5);
+    line(irrigation, "#97c3a2", 2);
+
+    /* 물탱크 */
+    rect(2990, 1410, 64, 74, "#577d76");
+    rect(2996, 1415, 52, 62, "#8ac0b3");
+    rect(2990, 1410, 64, 8, "#c3dcc3");
+    rect(3019, 1484, 5, 22, "#6a8d7a");
+
+    sign(2900, 1765, "시험 재배지");
+
+    /* 습지의 얕은 물과 갈대 */
+    for (let i = 0; i < 7; i++) {
+      const x = 2210 + i * 119;
+      const y = 1980 + i % 2 * 47;
+
+      rect(x, y, 73, 23, "#578e8c");
+      rect(x + 5, y + 3, 62, 16, "#82bdb0");
+      rect(x + 12, y + 7, 25, 2, "#c1dfbd");
+
+      for (let j = 0; j < 4; j++) {
+        rect(
+          x + j * 17,
+          y - 20 - j % 2 * 7,
+          2,
+          26,
+          "#628940"
+        );
+
+        rect(
+          x + j * 17 - 2,
+          y - 23 - j % 2 * 7,
+          6,
+          8,
+          "#ceb665"
+        );
+      }
+    }
+
+    sign(2160, 2100, "염생식물 관찰지");
+  }
+
+  return {
+    equipment,
+    landscape
+  };
+})();
+
+/* 기존 정원을 유지하고 지역별 장식 추가 */
+const bloom9PreviousDecor = BLOOM.decor;
+
+BLOOM.decor = function() {
+  bloom9PreviousDecor();
+  BLOOM9.landscape();
+};
+
+/* 기존 시설의 상호작용은 유지하고 외형만 교체 */
+BLOOM.stationsDraw = function() {
+  stations.forEach(BLOOM9.equipment);
+};
+
+/* BLOOM V9 끝 */
 })();
