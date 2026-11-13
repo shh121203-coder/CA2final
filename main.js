@@ -10783,4 +10783,771 @@ BLOOM.stationsDraw = function() {
 };
 
 /* BLOOM V9 끝 */
+/* =====================================================
+   BIO LAB V10 · 연구원 디자인과 동작
+===================================================== */
+
+const BIO_MOTION = (() => {
+  const images = new Map();
+
+  const hairColors = [
+    ["#322e39", "#554052", "#8c626d"],
+    ["#402f25", "#785033", "#ba854b"],
+    ["#68482b", "#bc8748", "#edc273"],
+    ["#252f35", "#3b4b54", "#697a7b"],
+    ["#513d36", "#8d6251", "#bb8c68"],
+    ["#4c3442", "#815370", "#b5849b"],
+    ["#4d4431", "#8c7e51", "#bdad76"]
+  ];
+
+  let action = null;
+  let lastPosition = null;
+  let walkingSince = 0;
+
+  const reduced =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+  function rect(g, x, y, w, h, color) {
+    g.fillStyle = color;
+
+    g.fillRect(
+      Math.round(x),
+      Math.round(y),
+      w,
+      h
+    );
+  }
+
+  /* 作業開始：ゲーム内の計算は変更しない */
+  function begin(kind, target) {
+    if (reduced) return;
+
+    action = {
+      kind,
+      start: performance.now(),
+      duration: kind === "water" ? 950 : 750,
+      target
+    };
+
+    if (target) {
+      const dx = target.x - state.player.x;
+      const dy = target.y - state.player.y;
+
+      state.player.dir = Math.abs(dx) > Math.abs(dy)
+        ? dx < 0 ? "left" : "right"
+        : dy < 0 ? "up" : "down";
+    }
+  }
+
+  /* 방향·걷기 프레임별 도트 캐릭터 */
+  function picture(
+    color,
+    variant,
+    direction,
+    frame,
+    working,
+    blink
+  ) {
+    const key = [
+      color,
+      variant,
+      direction,
+      frame,
+      working,
+      blink
+    ].join("|");
+
+    if (images.has(key)) {
+      return images.get(key);
+    }
+
+    const sprite = document.createElement("canvas");
+
+    sprite.width = 28;
+    sprite.height = 46;
+
+    const g = sprite.getContext("2d");
+    g.imageSmoothingEnabled = false;
+
+    const box = (x, y, w, h, c) => {
+      rect(g, x, y, w, h, c);
+    };
+
+    const hairIndex =
+      (
+        variant % hairColors.length +
+        hairColors.length
+      ) % hairColors.length;
+
+    const hair = hairColors[hairIndex];
+
+    const side =
+      direction === "left" ||
+      direction === "right";
+
+    const back = direction === "up";
+
+    const step = [0, -2, 0, 2][frame];
+
+    const bob =
+      frame % 2 && !working ? 1 : 0;
+
+    /* 바지 */
+    box(
+      8, 32,
+      6, 10 + Math.max(0, step),
+      "#354652"
+    );
+
+    box(
+      16, 32,
+      6, 10 + Math.max(0, -step),
+      "#354652"
+    );
+
+    box(9, 33, 2, 8, "#68808a");
+    box(17, 33, 2, 8, "#536b78");
+
+    /* 신발 */
+    box(
+      7,
+      41 + Math.max(0, step),
+      8, 3,
+      "#44342c"
+    );
+
+    box(
+      16,
+      41 + Math.max(0, -step),
+      8, 3,
+      "#44342c"
+    );
+
+    box(
+      8,
+      41 + Math.max(0, step),
+      5, 1,
+      "#96734c"
+    );
+
+    box(
+      17,
+      41 + Math.max(0, -step),
+      5, 1,
+      "#96734c"
+    );
+
+    g.save();
+
+    g.translate(
+      0,
+      bob + (working ? 2 : 0)
+    );
+
+    /* 연구복 */
+    box(8, 20, 14, 15, "#5b675d");
+    box(9, 21, 12, 13, "#e8e3cc");
+
+    /* 역할별 안쪽 옷 */
+    box(12, 22, 6, 11, color);
+
+    box(9, 22, 3, 12, "#fff5da");
+    box(18, 22, 3, 12, "#c7d0bd");
+
+    /* 옷깃 */
+    box(11, 21, 2, 4, "#fffbed");
+    box(17, 21, 2, 4, "#fffbed");
+
+    /* 주머니와 펜 */
+    box(19, 27, 2, 3, "#a0b5aa");
+    box(19, 27, 1, 1, "#4ba0aa");
+
+    if (back) {
+      box(10, 22, 10, 11, "#e8e3cc");
+      box(14, 23, 1, 9, "#c6cbbb");
+      box(10, 31, 10, 1, "#fff5da");
+    }
+
+    /* 팔 */
+    const arm = working ? -5 : step;
+
+    box(5, 23 + arm, 4, 10, "#7d8976");
+    box(6, 23 + arm, 3, 8, "#fff1cf");
+    box(6, 31 + arm, 3, 4, "#e4ab7e");
+
+    box(22, 23 - arm, 4, 10, "#7d8976");
+    box(22, 23 - arm, 3, 8, "#e7e4cb");
+    box(22, 31 - arm, 3, 4, "#e4ab7e");
+
+    /* 목과 얼굴 */
+    box(12, 18, 6, 4, "#c9946d");
+    box(9, 6, 13, 14, hair[0]);
+
+    box(10, 9, 11, 11, "#ddaa7c");
+    box(11, 10, 9, 9, "#f4c695");
+    box(12, 11, 6, 6, "#ffdbab");
+
+    box(8, 12, 2, 4, "#e6b185");
+    box(21, 12, 2, 4, "#d79d73");
+
+    /* 머리카락 */
+    box(8, 5, 15, 6, hair[0]);
+    box(10, 3, 10, 3, hair[0]);
+
+    box(9, 5, 12, 4, hair[1]);
+    box(11, 4, 7, 2, hair[2]);
+
+    box(8, 8, 4, 7, hair[1]);
+    box(20, 8, 3, 8, hair[0]);
+
+    /* 서로 다른 헤어 실루엣 */
+    if (variant % 3 === 0) {
+      box(7, 8, 3, 12, hair[0]);
+      box(21, 8, 3, 14, hair[0]);
+      box(22, 17, 3, 4, hair[1]);
+    } else if (variant % 3 === 1) {
+      box(9, 9, 7, 3, hair[1]);
+      box(14, 8, 4, 3, hair[1]);
+      box(16, 9, 3, 2, hair[2]);
+    } else {
+      box(7, 5, 4, 3, hair[1]);
+      box(18, 3, 4, 3, hair[1]);
+      box(10, 8, 3, 4, hair[2]);
+    }
+
+    if (back) {
+      /* 뒤를 바라보는 모습 */
+      box(9, 8, 13, 11, hair[1]);
+      box(9, 15, 13, 3, hair[0]);
+      box(11, 9, 2, 5, hair[2]);
+    } else if (side) {
+      /* 옆모습 */
+      const right = direction === "right";
+
+      box(
+        right ? 9 : 18,
+        9,
+        4, 9,
+        hair[1]
+      );
+
+      box(
+        right ? 21 : 8,
+        14,
+        2, 3,
+        "#f4c695"
+      );
+
+      box(
+        right ? 18 : 12,
+        13,
+        2,
+        blink ? 1 : 3,
+        "#37424a"
+      );
+
+      if (!blink) {
+        box(
+          right ? 18 : 12,
+          13,
+          1, 1,
+          "#d6e5df"
+        );
+      }
+
+      box(
+        right ? 19 : 11,
+        18,
+        2, 1,
+        "#b87562"
+      );
+    } else {
+      /* 정면 */
+      box(
+        12, 13,
+        2,
+        blink ? 1 : 3,
+        "#37424a"
+      );
+
+      box(
+        18, 13,
+        2,
+        blink ? 1 : 3,
+        "#37424a"
+      );
+
+      if (!blink) {
+        box(12, 13, 1, 1, "#e0ede3");
+        box(18, 13, 1, 1, "#e0ede3");
+      }
+
+      box(15, 18, 3, 1, "#b87562");
+      box(10, 17, 2, 1, "#edb392");
+    }
+
+    g.restore();
+
+    images.set(key, sprite);
+    return sprite;
+  }
+
+  /* 행동별 도구와 작은 효과 */
+  function drawAction(x, y, now) {
+    if (!action) return;
+
+    const progress =
+      (now - action.start) / action.duration;
+
+    const box = (a, b, w, h, color) => {
+      rect(ctx, x + a, y + b, w, h, color);
+    };
+
+    const direction =
+      state.player.dir === "left" ? -1 : 1;
+
+    if (action.kind === "water") {
+      /* 물뿌리개 */
+      box(
+        direction * 24 - 8,
+        -9,
+        17, 13,
+        "#468f9e"
+      );
+
+      box(
+        direction * 24 - 6,
+        -7,
+        13, 8,
+        "#89cfca"
+      );
+
+      box(
+        direction * 35 - 3,
+        -5,
+        10, 4,
+        "#b2e5d9"
+      );
+
+      box(
+        direction * 21 - 5,
+        -15,
+        9, 3,
+        "#c2e2c6"
+      );
+
+      for (let i = 0; i < 5; i++) {
+        const fall =
+          (progress * 2 + i * 0.18) % 1;
+
+        box(
+          direction * (39 + i * 2),
+          fall * 25,
+          2, 4,
+          "#9de8ec"
+        );
+      }
+    } else if (action.kind === "plant") {
+      /* 씨앗 봉투 */
+      box(
+        direction * 25 - 5,
+        -2,
+        12, 14,
+        "#dbc58a"
+      );
+
+      box(
+        direction * 25 - 3,
+        1,
+        8, 7,
+        "#78ad4e"
+      );
+
+      for (let i = 0; i < 4; i++) {
+        box(
+          direction * (25 + i * 4),
+          progress * 20 + i * 2,
+          2, 2,
+          "#f6d28c"
+        );
+      }
+    } else if (action.kind === "treat") {
+      /* 처리제 병 */
+      box(
+        direction * 27 - 4,
+        -12,
+        9, 17,
+        "#99cdbb"
+      );
+
+      box(
+        direction * 27 - 2,
+        -9,
+        5, 11,
+        "#b6e96c"
+      );
+
+      box(
+        direction * 27 - 3,
+        -15,
+        7, 4,
+        "#e5e7c2"
+      );
+    } else if (action.kind === "harvest") {
+      /* 수확 바구니 */
+      box(
+        direction * 25 - 7,
+        -1,
+        21, 14,
+        "#94632e"
+      );
+
+      box(
+        direction * 25 - 5,
+        -3,
+        17, 12,
+        "#d3a559"
+      );
+
+      box(
+        direction * 25 - 3,
+        -6,
+        6, 6,
+        "#ed7051"
+      );
+
+      box(
+        direction * 25 + 4,
+        -8,
+        6, 7,
+        "#90cd4d"
+      );
+    } else if (action.kind === "collect") {
+      /* 표본병 */
+      box(
+        direction * 25 - 4,
+        -7,
+        10, 15,
+        "#93c5bd"
+      );
+
+      box(
+        direction * 25 - 2,
+        -4,
+        6, 10,
+        "#b7e4c3"
+      );
+
+      box(
+        direction * 25 - 5,
+        -10,
+        12, 4,
+        "#e9d19b"
+      );
+    } else if (action.kind === "experiment") {
+      /* 실험 기록판 */
+      box(
+        direction * 26 - 6,
+        -13,
+        15, 20,
+        "#b4b78d"
+      );
+
+      box(
+        direction * 26 - 4,
+        -11,
+        11, 15,
+        "#fff0c5"
+      );
+
+      box(
+        direction * 26 - 1,
+        -8,
+        6, 2,
+        "#719f8e"
+      );
+    }
+  }
+
+  function draw(
+    x,
+    y,
+    color,
+    name,
+    player,
+    variant = 0
+  ) {
+    const now = performance.now();
+
+    let moving = false;
+    let frame = 0;
+
+    if (player) {
+      if (
+        lastPosition &&
+        lastPosition.state === state
+      ) {
+        moving =
+          Math.abs(x - lastPosition.x) +
+          Math.abs(y - lastPosition.y) > 0.02;
+      }
+
+      if (!moving) {
+        walkingSince = now;
+      }
+
+      lastPosition = {
+        x,
+        y,
+        state
+      };
+
+      if (
+        action &&
+        now - action.start >= action.duration
+      ) {
+        action = null;
+      }
+
+      if (moving && !reduced) {
+        frame =
+          Math.floor((now - walkingSince) / 125) % 4;
+      }
+    }
+
+    const working =
+      player && action && !moving;
+
+    const direction = player
+      ? state.player.dir
+      : "down";
+
+    const blink =
+      !reduced &&
+      now % 4300 > 4160;
+
+    const appearance = player
+      ? Object.keys(DATA.roles)
+          .indexOf(state.player.role) + 1
+      : variant;
+
+    ctx.save();
+
+    rect(
+      ctx,
+      x - 15,
+      y + 19,
+      31, 6,
+      "#21462e50"
+    );
+
+    const idleOffset =
+      !reduced && !moving && !working
+        ? Math.floor(now / 1100) % 2
+        : 0;
+
+    ctx.imageSmoothingEnabled = false;
+
+    ctx.drawImage(
+      picture(
+        color,
+        appearance,
+        direction,
+        frame,
+        Boolean(working),
+        blink
+      ),
+      Math.round(x) - 22,
+      Math.round(y) - 49 + idleOffset,
+      44,
+      73
+    );
+
+    if (player && action) {
+      drawAction(x, y, now);
+    }
+
+    if (name) {
+      ctx.font = "bold 11px sans-serif";
+      ctx.textAlign = "center";
+
+      ctx.strokeStyle = "#38492c";
+      ctx.lineWidth = 3;
+      ctx.strokeText(name, x, y - 58);
+
+      ctx.fillStyle = "#fff4cf";
+      ctx.fillText(name, x, y - 58);
+    }
+
+    ctx.restore();
+  }
+
+  return {
+    begin,
+    draw
+  };
+})();
+
+/* 기존 캐릭터 표시를 새 디자인으로 교체 */
+BLOOM.character = BIO_MOTION.draw;
+drawCharacter = BIO_MOTION.draw;
+
+/* 씨앗 심기: 씨앗이 실제 소비된 경우만 */
+const motionPlantSeed = plantSeed;
+
+plantSeed = function(index, cropId) {
+  const before =
+    state.inventory.seeds[cropId] || 0;
+
+  const result = motionPlantSeed(index, cropId);
+
+  if (
+    (state.inventory.seeds[cropId] || 0) < before
+  ) {
+    BIO_MOTION.begin(
+      "plant",
+      plotPosition(index)
+    );
+  }
+
+  return result;
+};
+
+/* 물주기: 체력이 실제 소비된 경우만 */
+const motionPlotAction = handlePlotAction;
+
+handlePlotAction = function(index, kind) {
+  const before = state.stamina;
+
+  const result =
+    motionPlotAction(index, kind);
+
+  if (
+    kind === "water" &&
+    state.stamina < before
+  ) {
+    BIO_MOTION.begin(
+      "water",
+      plotPosition(index)
+    );
+  }
+
+  return result;
+};
+
+/* 수확: 실제 수확 처리 후 */
+const motionHarvest = harvestPlot;
+
+harvestPlot = function(index) {
+  const before = state.plots[index]?.crop;
+
+  const result = motionHarvest(index);
+
+  if (
+    before &&
+    state.plots[index]?.crop !== before
+  ) {
+    BIO_MOTION.begin(
+      "harvest",
+      plotPosition(index)
+    );
+  }
+
+  return result;
+};
+
+/* 처리제: 실제 재료 소비 후 */
+const motionTreatment = applyTreatment;
+
+applyTreatment = function(index, id) {
+  const before =
+    state.inventory.treatments[id] || 0;
+
+  const result =
+    motionTreatment(index, id);
+
+  if (
+    (state.inventory.treatments[id] || 0) < before
+  ) {
+    BIO_MOTION.begin(
+      "treat",
+      plotPosition(index)
+    );
+  }
+
+  return result;
+};
+
+/* 표본 채집 */
+const motionCollect = collectSample;
+
+collectSample = function(target) {
+  const before = state.collectedToday.length;
+
+  const result = motionCollect(target);
+
+  if (
+    state.collectedToday.length > before
+  ) {
+    BIO_MOTION.begin("collect", target);
+  }
+
+  return result;
+};
+
+/* 연못 물 채집 */
+const motionWaterSample = collectPondWater;
+
+collectPondWater = function() {
+  const before =
+    state.inventory.samples.water || 0;
+
+  const result = motionWaterSample();
+
+  if (
+    (state.inventory.samples.water || 0) > before
+  ) {
+    BIO_MOTION.begin(
+      "collect",
+      stations.find(
+        station => station.type === "pond"
+      )
+    );
+  }
+
+  return result;
+};
+
+/* 실험 장비를 사용할 때의 조작 표현 */
+const motionUseStation = useStation;
+
+useStation = function(station) {
+  const result = motionUseStation(station);
+
+  const experimentTypes = [
+    "pcr",
+    "scope",
+    "culture",
+    "gel",
+    "sequence",
+    "enzyme",
+    "contamination",
+    "cross",
+    "climate"
+  ];
+
+  if (experimentTypes.includes(station.type)) {
+    BIO_MOTION.begin(
+      "experiment",
+      station
+    );
+  }
+
+  return result;
+};
+
+/* BIO MOTION V10 끝 */
 })();
