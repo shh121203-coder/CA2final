@@ -7,7 +7,7 @@
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
 
-  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingEnabled =false;
 
   const WORLD = {
     width: 3200,
@@ -9871,4 +9871,357 @@ draw = function() {
 };
 
 /* BLOOM V7 끝 */
+/* =====================================================
+   BLOOM V7 · 작물과 재배지 그래픽
+===================================================== */
+
+drawCropSprite = function(
+  x,
+  y,
+  crop,
+  stage,
+  ready,
+  health
+) {
+  const box = (a, b, w, h, color) => {
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+      Math.round(x + a),
+      Math.round(y + b),
+      w,
+      h
+    );
+  };
+
+  const healthy = (health ?? 100) >= 50;
+
+  const dark = healthy
+    ? "#246735"
+    : "#79662e";
+
+  const light = healthy
+    ? "#78cf43"
+    : "#c6a84e";
+
+  function leaf(a, b) {
+    box(a, b, 8, 3, dark);
+    box(a + 2, b - 3, 7, 4, dark);
+    box(a + 2, b - 2, 5, 2, light);
+  }
+
+  /* 새싹 */
+  if (stage === 0) {
+    box(-1, 0, 2, 8, dark);
+    leaf(-8, 0);
+    leaf(1, -3);
+    return;
+  }
+
+  const height = 14 + stage * 9;
+
+  box(-1, -height, 3, height + 8, dark);
+  box(0, -height + 2, 1, height + 3, light);
+
+  leaf(-10, -6);
+  leaf(2, -12);
+  leaf(-10, -height + 7);
+
+  function fruit(a, b, color) {
+    box(a - 1, b, 9, 7, "#7e3c26");
+    box(a, b - 1, 7, 8, color);
+    box(a + 1, b, 3, 2, "#ffd29b");
+    box(a + 2, b - 3, 4, 2, dark);
+  }
+
+  if (crop.id === "tomato") {
+    /* 지지대와 토마토 열매 */
+    box(-15, -height + 3, 2, height + 12, "#b98642");
+    box(14, -height + 3, 2, height + 12, "#b98642");
+    box(-15, -height + 10, 31, 2, "#d6ad68");
+
+    if (stage >= 2) {
+      fruit(
+        -11,
+        -16,
+        ready ? "#f44830" : "#82bd41"
+      );
+
+      fruit(
+        5,
+        -24,
+        ready ? "#e93826" : "#82bd41"
+      );
+
+      fruit(
+        1,
+        -7,
+        ready ? "#ff6c35" : "#91cb47"
+      );
+    }
+  } else if (crop.id === "strawberry") {
+    /* 낮게 퍼지는 잎과 딸기 */
+    leaf(-16, -4);
+    leaf(5, -5);
+    leaf(-8, -13);
+
+    if (stage >= 2) {
+      fruit(
+        -12,
+        -1,
+        ready ? "#ed3552" : "#d7df85"
+      );
+
+      fruit(
+        4,
+        2,
+        ready ? "#fa4d59" : "#d7df85"
+      );
+
+      box(-10, 2, 1, 1, "#ffe296");
+      box(6, 5, 1, 1, "#ffe296");
+    }
+  } else if (crop.id === "pea") {
+    /* 지지대와 완두 꼬투리 */
+    box(8, -height - 5, 2, height + 12, "#bb934d");
+
+    for (let i = 0; i < stage; i++) {
+      box(
+        3,
+        -height + 7 + i * 10,
+        6,
+        11,
+        "#2b8038"
+      );
+
+      box(
+        4,
+        -height + 8 + i * 10,
+        3,
+        8,
+        "#a8dc4a"
+      );
+    }
+  } else if (crop.id === "sunflower") {
+    /* 해바라기 꽃 */
+    const top = -height - 8;
+
+    box(-10, top + 3, 22, 10, "#dd8a1f");
+    box(-6, top - 2, 14, 20, "#ffc834");
+    box(-10, top + 6, 22, 4, "#ffdf53");
+
+    box(-4, top + 3, 10, 10, "#7c4a23");
+    box(-2, top + 5, 6, 6, "#a66c2b");
+    box(-1, top + 5, 2, 2, "#e0a94a");
+  } else if (crop.id === "rice") {
+    /* 여러 줄기와 벼 이삭 */
+    for (let i = 0; i < 5; i++) {
+      const a = -10 + i * 5;
+      const b = -height + Math.abs(i - 2) * 4;
+
+      box(a, b, 2, -b + 9, dark);
+
+      if (stage >= 2) {
+        for (let j = 0; j < 4; j++) {
+          box(
+            a + 2,
+            b + j * 4,
+            3,
+            2,
+            ready ? "#f3d15d" : "#a7cc48"
+          );
+        }
+      }
+    }
+  } else if (crop.id === "saltwort") {
+    /* 통통한 다육질 줄기 */
+    for (let i = 0; i < 5; i++) {
+      const a = -10 + i * 5;
+      const b = -height + Math.abs(i - 2) * 6;
+
+      box(
+        a,
+        b,
+        4,
+        -b + 8,
+        ready ? "#69bb8d" : "#4ca776"
+      );
+
+      box(a, b, 2, -b + 6, "#a6dd95");
+    }
+  } else if (crop.id === "luminara") {
+    /* 게임 속 형광 연구 품종 */
+    for (let i = 0; i < 3; i++) {
+      const a = -10 + i * 10;
+      const b = -height + i % 2 * 8;
+
+      box(a, b, 6, 8, "#187b7d");
+      box(a + 1, b - 2, 4, 7, "#73f0cf");
+      box(a + 2, b, 2, 2, "#e1ffb8");
+    }
+  } else {
+    /* 애기장대의 작은 흰 꽃 */
+    for (let i = 0; i < stage + 1; i++) {
+      const a = i % 2 ? -6 : 4;
+      const b = -height + i * 7;
+
+      box(a, b, 5, 5, "#fff1c7");
+      box(a + 1, b + 1, 2, 2, "#f6c94c");
+    }
+  }
+
+  /* 수확 가능 표시 */
+  if (ready) {
+    box(17, -height - 6, 1, 7, "#fff7bc");
+    box(14, -height - 3, 7, 1, "#fff7bc");
+  }
+};
+
+/* 넓은 재배 구획과 정돈된 밭고랑 */
+drawPlots = function() {
+  for (let i = 0; i < state.unlockedPlots; i++) {
+    const position = plotPosition(i);
+    const plot = state.plots[i];
+
+    if (!plot) continue;
+
+    if (
+      !bioVisible(
+        position.x - 75,
+        position.y - 85,
+        150,
+        150
+      )
+    ) {
+      continue;
+    }
+
+    const box = (x, y, w, h, color) => {
+      ctx.fillStyle = color;
+
+      ctx.fillRect(
+        Math.round(x),
+        Math.round(y),
+        w,
+        h
+      );
+    };
+
+    const x = position.x;
+    const y = position.y;
+
+    /* 그림자와 목재 테두리 */
+    box(x - 71, y - 48, 146, 108, "#4b552d40");
+    box(x - 73, y - 51, 146, 104, "#88602a");
+    box(x - 70, y - 48, 140, 98, "#e0ae55");
+
+    box(
+      x - 66,
+      y - 44,
+      132,
+      90,
+      plot.watered ? "#73502d" : "#b17c36"
+    );
+
+    /* 밭고랑 */
+    for (let row = 0; row < 6; row++) {
+      box(
+        x - 62,
+        y - 38 + row * 14,
+        124,
+        3,
+        "#684321"
+      );
+
+      box(
+        x - 61,
+        y - 35 + row * 14,
+        122,
+        2,
+        plot.watered ? "#9a753c" : "#d8a24b"
+      );
+    }
+
+    if (plot.watered) {
+      box(x - 48, y + 28, 10, 2, "#a1c6aa");
+      box(x + 25, y + 13, 8, 2, "#a1c6aa");
+    }
+
+    if (!plot.crop) {
+      for (let j = 0; j < 6; j++) {
+        box(
+          x - 36 + j % 3 * 35,
+          y - 20 + Math.floor(j / 3) * 35,
+          3,
+          2,
+          "#e3bc72"
+        );
+      }
+
+      continue;
+    }
+
+    const crop = DATA.crops.find(
+      entry => entry.id === plot.crop
+    );
+
+    if (!crop) continue;
+
+    const stage = Math.max(
+      0,
+      Math.min(
+        3,
+        Math.floor(plot.age / crop.grow * 4)
+      )
+    );
+
+    const ready = plot.age >= crop.grow;
+
+    /* 한 재배 구획을 세 포기의 군락으로 표현 */
+    [
+      [-35, -7],
+      [32, -7],
+      [0, 28]
+    ].forEach(([a, b]) => {
+      drawCropSprite(
+        x + a,
+        y + b,
+        crop,
+        stage,
+        ready,
+        plot.health
+      );
+    });
+
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+
+    const label =
+      crop.name + (ready ? " · 수확 가능" : "");
+
+    const labelWidth =
+      ctx.measureText(label).width + 12;
+
+    box(
+      x - labelWidth / 2,
+      y + 56,
+      labelWidth,
+      17,
+      "#fff0bf"
+    );
+
+    ctx.fillStyle = "#65431e";
+    ctx.fillText(label, x, y + 68);
+    ctx.textAlign = "left";
+
+    /* 처리제를 사용한 구획의 작은 표식 */
+    if (plot.treatment) {
+      box(x + 54, y - 55, 8, 14, "#638a80");
+      box(x + 56, y - 57, 4, 3, "#e9d9ad");
+      box(x + 56, y - 51, 4, 7, "#a5e986");
+    }
+  }
+};
+
+/* 작물 패치 끝 */
 })();
